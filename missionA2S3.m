@@ -9,4 +9,4 @@ clear all; close all;
 load DataA2 imagesReceived;
 
 % Begin writing your MATLAB solution below this line.
-fddsv
+% fddsv
