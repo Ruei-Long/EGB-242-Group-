@@ -9,6 +9,7 @@ clear all; close all;
 load DataA2 audioMultiplexNoisy fs sid;
 
 % Begin writing your MATLAB solution below this line.R
+load('DataA2.mat')
 
 %% Section 1.1 plot audioMultiplexNoisy in frequency and time domain
 %Create a time vector
@@ -20,7 +21,7 @@ freq = linspace(-fs/2, fs/2, samples + 1);
 freq(end) = [];
 
 % Convert to the frequency domain
-frequencySpectrum = fftshift(fft(audioMultiplexNoisy)) / fs;
+frequencySpectrum = fftshift(fft(audioMultiplexNoisy)) / samples;
 
 % Plot the time domain vector
 figure;
@@ -208,7 +209,7 @@ xlim([-4000, 4000]);
 grid on;
 
 subplot(2, 1, 2);
-plot(timeVector, audioRecieved3);
+plot(timeVector, audioRecieved4);
 title('Time domain of 56290Hz');
 xlabel('Time (ms)');
 ylabel('Amplitude');
@@ -248,10 +249,246 @@ xlim([-4000, 4000]);
 grid on;
 
 subplot(2, 1, 2);
-plot(timeVector, audioRecieved3);
+plot(timeVector, audioRecieved5);
 title('Time domain of 72160Hz');
 xlabel('Time (ms)');
 ylabel('Amplitude');
 grid on;
 %% Section 1.3
-y = channel(sid1, x, fs);
+% See tutorial 7 for a way to complete this assignment. 
+% Define time period 
+ts = 1/fs;
+
+% Create an impulse
+impulse = [(1/ts), zeros(1, 49)];
+
+% Create round values for vectors
+sid = round(sid);
+fs = round(fs);
+
+%Use the channel feature to model the impulse response 
+channelOutput = channel(sid, impulse, fs);
+
+%Find the frequency response and create the frequency vector 
+channelFreq = fftshift(fft(channelOutput)) / fs;
+channelFrequency = linspace(-fs/2, fs/2, length(channelOutput) + 1);
+channelFrequency(end) = [];
+
+%Plotting both the magnitude spectrum and multiplexed audio on the same
+%graph
+figure;
+hold on;
+
+%Labelling and title of the graph
+title('Channel Frequency response and audioMultiplexNoisy');
+xlabel('Frequency Hz');
+ylabel('Magnitude');
+
+%Plotted data
+plot(channelFrequency, abs(channelFreq), 'LineWidth', 1.2);
+plot(freq, abs(frequencySpectrum), '--');
+legend('Channel frequency response', 'Audio multiplex spectrum');
+grid on;
+
+% Use these limits to inspect sections of the plot. 
+%ylim([0, 0.05]);
+%xlim([0, 0.05]);
+hold off;
+
+%% Section 1.4 
+% Reverse distorion for frequency 1 
+frequencyRev = fft(channelOutput, samples) / fs;
+
+% Create the frequency domain vector
+revfft = fft(audioMultiplexNoisy) / fs;
+
+% Equalise the reversed frequency domain
+revAudio = revfft ./ frequencyRev;
+
+% Convert to the time domain
+revAudioEqualized = ifft(revAudio) * fs;
+
+% Demodulate the frequency
+demRevSignal = revAudioEqualized .* carrierModulation;
+cleanAudio = lowpass(demRevSignal, cutoffFreq, fs);
+cleanAudio = cleanAudio / max(abs(cleanAudio));
+
+% Listen to the denoised audio 
+sound(cleanAudio, fs);
+
+% Plot equalised signal in time and frequency domains
+figure;
+subplot(2, 1, 1);
+plot(timeVector, cleanAudio);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(2, 1, 2);
+plot(freq, abs(fftshift(fft(cleanAudio) / samples)));
+title('Equalised signal in frequency domain');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+%% Section 1.4 frequency 2 
+% Reverse distorion for frequency 2 
+demRevSignal2 = revAudioEqualized .* carrierModulation2;
+cleanAudio2 = lowpass(demRevSignal2, cutoffFreq, fs);
+cleanAudio2 = cleanAudio2 / max(abs(cleanAudio2));
+
+% Listen to the denoised audio 
+sound(cleanAudio2, fs);
+
+% Plot equalised signal in time and frequency domains
+figure;
+subplot(2, 1, 1);
+plot(timeVector, cleanAudio2);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(2, 1, 2);
+plot(freq, abs(fftshift(fft(cleanAudio2) / samples)));
+title('Equalised signal in frequency domain');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+%% Section 1.4 frequency 3 
+% Reverse distorion for frequency 3 
+demRevSignal3 = revAudioEqualized .* carrierModulation3;
+cleanAudio3 = lowpass(demRevSignal3, cutoffFreq, fs);
+cleanAudio3 = cleanAudio3 / max(abs(cleanAudio3));
+
+% Listen to the denoised audio 
+sound(cleanAudio3, fs);
+
+% Plot equalised signal in time and frequency domains
+figure;
+subplot(2, 1, 1);
+plot(timeVector, cleanAudio3);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(2, 1, 2);
+plot(freq, abs(fftshift(fft(cleanAudio3) / samples)));
+title('Equalised signal in frequency domain');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+%% Section 1.4 frequency 4 
+% Reverse distorion for frequency 4 
+demRevSignal4 = revAudioEqualized .* carrierModulation4;
+cleanAudio4 = lowpass(demRevSignal4, cutoffFreq, fs);
+cleanAudio4 = cleanAudio4 / max(abs(cleanAudio4));
+
+% Listen to the denoised audio 
+sound(cleanAudio4, fs);
+
+% Plot equalised signal in time and frequency domains
+figure;
+subplot(2, 1, 1);
+plot(timeVector, cleanAudio4);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(2, 1, 2);
+plot(freq, abs(fftshift(fft(cleanAudio4) / samples)));
+title('Equalised signal in frequency domain');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+%% Section 1.4 frequency 5 
+% Reverse distorion for frequency 5 
+demRevSignal5 = revAudioEqualized .* carrierModulation5;
+cleanAudio5 = lowpass(demRevSignal5, cutoffFreq, fs);
+cleanAudio5 = cleanAudio5 / max(abs(cleanAudio5));
+
+% Listen to the denoised audio 
+sound(cleanAudio5, fs);
+
+% Plot equalised signal in time and frequency domains
+figure;
+subplot(2, 1, 1);
+plot(timeVector, cleanAudio5);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(2, 1, 2);
+plot(freq, abs(fftshift(fft(cleanAudio5) / samples)));
+title('Equalised signal in frequency domain');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+%% Section 1.5
+% Create a frequency shift of the demodulated audio
+CleanAudio = fftshift(fft(CleanAudio));
+
+% Find the frequency resolution to represent the spacing between the frequency spikes
+% in the audio singal
+df = fs / length(cleanAudio);
+
+% Find the base indexes for 0 Hz, +3000 Hz, and -3000 Hz
+indexDC = round(length(CleanAudio) / 2) + 1;
+indexPositive3000Hz = indexDC + round(3000 / df);
+indexNegative3000Hz = indexDC - round(3000 / df);
+
+% Set a spike width for removal
+spikeWidth = 2;
+
+% Remove the 0 Hz DC offset point
+CleanAudio(indexDC) = 0;
+
+% Clear the positive 3000 Hz spike range
+PositiveStart = indexPositive3000Hz - spikeWidth;
+PositiveEnd   = indexPositive3000Hz + spikeWidth;
+CleanAudio(PositiveStart : PositiveEnd) = 0;
+
+% Clear the negative 3000 Hz spike range
+NegativeStart = indexNegative3000Hz - spikeWidth;
+NegativeEnd = indexNegative3000Hz + spikeWidth;
+CleanAudio(NegativeStart : NegativeEnd) = 0;
+
+% Convert the cleaned spectrum back into a time-domain sound signal
+finalAudio = ifft(CleanAudio);
+
+% Normalise the final audio signal
+finalAudio = finalAudio / max(abs(finalAudio));
+
+% Listen to the clean audio signal
+sound(real(finalAudio), fs);
+
+% Plot in the time and frequency domain
+% Frequency domain
+figure;
+subplot(2, 1, 1);
+plot(freq, abs(fftshift(fft(finalAudio) / samples)));
+title('De-noised Frequency Domain');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+% xlim([-cutoffFreq, cutoffFreq]); 
+grid on;
+
+% Time domain
+subplot(2, 1, 2);
+plot(timeVector, finalAudio);
+title('De-noised Time Domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
