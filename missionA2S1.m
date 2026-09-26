@@ -76,7 +76,6 @@ sound(audioRecieved1, fs);
 % amount of music.  This sound simulates the background noise that could be
 % heard within the mars space shuttle. 
 
-figure;
 subplot(2, 1, 1);
 plot(freq, abs(fftshift(audioRecievedFreq1)));
 title('Frequency 1 8210 Hz');
@@ -85,6 +84,7 @@ ylabel('Magnitude');
 xlim([-4000, 4000]);
 grid on;
 
+figure;
 subplot(2, 1, 2);
 plot(timeVector, audioRecieved1);
 title('Time domain of 8210Hz');
@@ -132,8 +132,6 @@ title('Time domain of 24190Hz');
 xlabel('Time (ms)');
 ylabel('Amplitude');
 grid on;
-
-
 %% Section 1.2 frequency 3
 % Select required carrier frequency in preparation for modulation
 freq3 = 40210;
@@ -175,6 +173,7 @@ xlabel('Time (ms)');
 ylabel('Amplitude');
 grid on;
 
+
 %% Section 1.2 frequency 4
 % Select required carrier frequency in preparation for modulation
 freq4 = 56290;
@@ -214,7 +213,6 @@ title('Time domain of 56290Hz');
 xlabel('Time (ms)');
 ylabel('Amplitude');
 grid on;
-
 %% Section 1.2 frequency 5
 % Select required carrier frequency in preparation for modulation
 freq5 = 72160;
@@ -319,18 +317,18 @@ sound(cleanAudio, fs);
 % Plot equalised signal in time and frequency domains
 figure;
 subplot(2, 1, 1);
-plot(timeVector, cleanAudio);
-title('Equalised signal in time domain');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-subplot(2, 1, 2);
 plot(freq, abs(fftshift(fft(cleanAudio) / samples)));
 title('Equalised signal in frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
 xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, cleanAudio);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
 grid on;
 
 %% Section 1.4 frequency 2 
@@ -345,18 +343,18 @@ sound(cleanAudio2, fs);
 % Plot equalised signal in time and frequency domains
 figure;
 subplot(2, 1, 1);
-plot(timeVector, cleanAudio2);
-title('Equalised signal in time domain');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-subplot(2, 1, 2);
 plot(freq, abs(fftshift(fft(cleanAudio2) / samples)));
 title('Equalised signal in frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
 xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, cleanAudio2);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
 grid on;
 
 %% Section 1.4 frequency 3 
@@ -371,18 +369,18 @@ sound(cleanAudio3, fs);
 % Plot equalised signal in time and frequency domains
 figure;
 subplot(2, 1, 1);
-plot(timeVector, cleanAudio3);
-title('Equalised signal in time domain');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-subplot(2, 1, 2);
 plot(freq, abs(fftshift(fft(cleanAudio3) / samples)));
 title('Equalised signal in frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
 xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, cleanAudio3);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
 grid on;
 %% Section 1.4 frequency 4 
 % Reverse distorion for frequency 4 
@@ -396,18 +394,18 @@ sound(cleanAudio4, fs);
 % Plot equalised signal in time and frequency domains
 figure;
 subplot(2, 1, 1);
-plot(timeVector, cleanAudio4);
-title('Equalised signal in time domain');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-subplot(2, 1, 2);
 plot(freq, abs(fftshift(fft(cleanAudio4) / samples)));
 title('Equalised signal in frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
 xlim([-cutoffFreq, cutoffFreq]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, cleanAudio4);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
 grid on;
 %% Section 1.4 frequency 5 
 % Reverse distorion for frequency 5 
@@ -421,13 +419,6 @@ sound(cleanAudio5, fs);
 % Plot equalised signal in time and frequency domains
 figure;
 subplot(2, 1, 1);
-plot(timeVector, cleanAudio5);
-title('Equalised signal in time domain');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-subplot(2, 1, 2);
 plot(freq, abs(fftshift(fft(cleanAudio5) / samples)));
 title('Equalised signal in frequency domain');
 xlabel('Frequency (Hz)');
@@ -435,9 +426,15 @@ ylabel('Magnitude');
 xlim([-cutoffFreq, cutoffFreq]);
 grid on;
 
+subplot(2, 1, 2);
+plot(timeVector, cleanAudio5);
+title('Equalised signal in time domain');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
 %% Section 1.5
 % Create a frequency shift of the demodulated audio
-CleanAudio = fftshift(fft(CleanAudio));
+CleanAudio = fftshift(fft(cleanAudio));
 
 % Find the frequency resolution to represent the spacing between the frequency spikes
 % in the audio singal
