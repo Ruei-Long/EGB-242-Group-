@@ -43,6 +43,41 @@ grid on;
 % There are 5 carrier frequencies in the frequency domain.  The plot above
 % shows the freqency spikes at [8210, 24190, 40210, 56290, 72160]
 
+%% Section 1.2 with function block
+%Set the cutoff frequency
+cutoffFreq = 4000;
+
+% Using assignment 1 multiplexed system
+demultiplex = fft(audioMultiplexNoisy) / fs;
+
+% Create a function to modulate all frequencies using cos(2*pi*f*t);
+function c = carrierFreq(freq, timeVector, signal)
+    c = cos(2*pi*freq*timeVector);
+    demodulatedSignal = signal.* c;
+    audioRecieved = lowpass(demodulatedSignal1, cutoffFreq, fs);
+end 
+
+% Carrier Frequency 1 - 5
+C1 = carrierFreq(8210, timeVector);
+C2 = carrierFreq(24190, timeVector);
+C3 = carrierFreq(40210, timeVector);
+C4 = carrierFreq(56290, timeVector);
+C5 = carrierFreq(72160, timeVector);
+
+
+% Demodulate the audio signal
+demodulatedSignal1 = audioMultiplexNoisy.*C1;
+
+% Apply low pass filtering to reduce signal noise
+audioRecieved1 = lowpass(demodulatedSignal1, cutoffFreq, fs);
+
+% Normalise the audio signal 
+audioRecieved1 = audioRecieved1 / max(abs(audioRecieved1));
+
+% Bring freq1 into the frequency domain
+audioRecievedFreq1 = fft(audioRecieved1) / fs;
+
+
 %% Section 1.2 
 % In order to cut off any negative frequency from the frequency plot above
 % a lowpass filter was applied to cut off any small signal and negative
