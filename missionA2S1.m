@@ -43,6 +43,134 @@ grid on;
 % There are 5 carrier frequencies in the frequency domain.  The plot above
 % shows the freqency spikes at [8210, 24190, 40210, 56290, 72160]
 
+%% Section 1.2 with function block
+%Set the cutoff frequency
+cutoffFreq = 4000;
+
+% Using assignment 1 multiplexed system
+demultiplex = fft(audioMultiplexNoisy) / fs;
+
+% Define carrier frequency
+CF1 = 8210;
+CF2 = 24190;
+CF3 = 40210;
+CF4 = 56290;
+CF5 = 72160;
+
+% Create a function to modulate all frequencies using cos(2*pi*f*t);
+function [c, demodulatedSignal, audioReceived, ... 
+                audioNormal, audioReceivedFreq] = ... 
+                carrierFreq(freq, timeVector, signal, cutoffFreq, fs)
+
+    c = cos(2*pi*freq*timeVector);
+    demodulatedSignal = signal.* c;
+    audioReceived = lowpass(demodulatedSignal, cutoffFreq, fs);
+    audioNormal = audioReceived/ max(abs(audioReceived));
+    audioReceivedFreq = fft(audioReceived) / fs;
+
+end 
+
+% Output the functions for each carrier frequency
+[C1, demod1, audioreceived1, audioNormal1, audioReceivedFreq1] = ...
+    carrierFreq(CF1, timeVector, audioMultiplexNoisy, cutoffFreq, fs);
+[C2, demod2, audioreceived2, audioNormal2, audioReceivedFreq2] = ...
+    carrierFreq(CF2, timeVector, audioMultiplexNoisy, cutoffFreq, fs);
+[C3, demod3, audioreceived3, audioNormal3, audioReceivedFreq3] = ...
+    carrierFreq(CF3, timeVector, audioMultiplexNoisy, cutoffFreq, fs);
+[C4, demod4, audioreceived4, audioNormal4, audioReceivedFreq4] = ...
+    carrierFreq(CF4, timeVector, audioMultiplexNoisy, cutoffFreq, fs);
+[C2, demod5, audioreceived5, audioNormal5, audioReceivedFreq5] = ...
+    carrierFreq(CF5, timeVector, audioMultiplexNoisy, cutoffFreq, fs);
+
+sound(audioreceived1, fs);
+%sound(audioreceived2, fs);
+%sound(audioreceived3, fs);
+%sound(audioreceived4, fs);
+%sound(audioreceived5, fs);
+
+
+%% 1.2 plot frequency 8210
+figure;
+subplot(2, 1, 1);
+plot(freq, abs(fftshift(audioRecievedFreq1)));
+title('Frequency 1 8210 Hz');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-4000, 4000]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, audioreceived1);
+title('Time domain of 8210Hz');
+xlabel('Time (ms)');
+ylabel('Amplitude');
+grid on;
+
+%% 1.2 plot frequency 24190 
+figure;
+subplot(2, 1, 1);
+plot(freq, abs(fftshift(audioRecievedFreq2)));
+title('Frequency 1 24190 Hz');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-4000, 4000]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, audioreceived2);
+title('Time domain of 24190 Hz');
+xlabel('Time (ms)');
+ylabel('Amplitude');
+grid on;
+
+%% 1.2 plot frequency 40210 
+figure;
+subplot(2, 1, 1);
+plot(freq, abs(fftshift(audioRecievedFreq3)));
+title('Frequency 1 40210 Hz');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-4000, 4000]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, audioreceived3);
+title('Time domain of 40210 Hz');
+xlabel('Time (ms)');
+ylabel('Amplitude');
+grid on;
+%% 1.2 plot frequency 56290 
+figure;
+subplot(2, 1, 1);
+plot(freq, abs(fftshift(audioRecievedFreq4)));
+title('Frequency 1 56290 Hz');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-4000, 4000]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, audioreceived4);
+title('Time domain of 56290 Hz');
+xlabel('Time (ms)');
+ylabel('Amplitude');
+grid on;
+%% 1.2 plot frequency 72160 
+figure;
+subplot(2, 1, 1);
+plot(freq, abs(fftshift(audioRecievedFreq5)));
+title('Frequency 1 72160 Hz');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([-4000, 4000]);
+grid on;
+
+subplot(2, 1, 2);
+plot(timeVector, audioreceived5);
+title('Time domain of 72160 Hz');
+xlabel('Time (ms)');
+ylabel('Amplitude');
+grid on;
 %% Section 1.2 
 % In order to cut off any negative frequency from the frequency plot above
 % a lowpass filter was applied to cut off any small signal and negative
