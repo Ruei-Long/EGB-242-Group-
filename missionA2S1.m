@@ -25,6 +25,7 @@ frequencySpectrum = fftshift(fft(audioMultiplexNoisy)) / samples;
 
 % Plot the time domain vector
 figure;
+subplot(2,1,2);
 plot(timeVector, audioMultiplexNoisy);
 title('audioMultiplexNoisy in time domain');
 xlabel('Time(s)');
@@ -32,7 +33,7 @@ ylabel('Amplitude');
 grid on;
 
 % plot in the frequency spectrum
-figure;
+subplot(2,1,1);
 plot(freq, abs(frequencySpectrum));
 title('audioMultiplexNoisy in Frequency domain');
 xlabel('Frequency (Hz)');
@@ -76,6 +77,7 @@ sound(audioRecieved1, fs);
 % amount of music.  This sound simulates the background noise that could be
 % heard within the mars space shuttle. 
 
+figure;
 subplot(2, 1, 1);
 plot(freq, abs(fftshift(audioRecievedFreq1)));
 title('Frequency 1 8210 Hz');
@@ -84,7 +86,6 @@ ylabel('Magnitude');
 xlim([-4000, 4000]);
 grid on;
 
-figure;
 subplot(2, 1, 2);
 plot(timeVector, audioRecieved1);
 title('Time domain of 8210Hz');
@@ -92,6 +93,9 @@ xlabel('Time (ms)');
 ylabel('Amplitude');
 grid on;
 
+%Discuss the offset of the DC should be symetrical around 0. Look at the offset that is in the time domain.   
+% Look at 3000Hz at each point in the plot. Look at cutting the frequency
+% down around this point
 %% Section 1.2 frequency 2
 % Select required carrier frequency in preparation for modulation
 freq2 = 24190;
@@ -112,7 +116,7 @@ audioRecieved2 = audioRecieved2 / max(abs(audioRecieved2));
 audioRecievedFreq2 = fft(audioRecieved2) / fs;
 
 % Listen to multiplexed audio
-sound(real(audioRecieved2), fs);
+%sound(real(audioRecieved2), fs);
 
 % This audio signal is a lower frequency noise of the mars shuttle in
 % transport.  There is a faint music in the background. 
@@ -152,7 +156,7 @@ audioRecieved3 = audioRecieved3 / max(abs(audioRecieved3));
 audioRecievedFreq3 = fft(audioRecieved3) / fs;
 
 % Listen to multiplexed audio
-sound(real(audioRecieved3), fs);
+% sound(real(audioRecieved3), fs);
 
 % This is a high pitched background noise with smooth music in the
 % background. 
@@ -173,7 +177,7 @@ xlabel('Time (ms)');
 ylabel('Amplitude');
 grid on;
 
-
+% Time domain is not straight.
 %% Section 1.2 frequency 4
 % Select required carrier frequency in preparation for modulation
 freq4 = 56290;
@@ -194,7 +198,7 @@ audioRecieved4 = audioRecieved4 / max(abs(audioRecieved4));
 audioRecievedFreq4 = fft(audioRecieved4) / fs;
 
 % Listen to multiplexed audio
-sound(real(audioRecieved4), fs);
+%sound(real(audioRecieved4), fs);
 
 % High pitched noise simulating the background noise of the space shuttle.
 
@@ -233,7 +237,7 @@ audioRecieved5 = audioRecieved5 / max(abs(audioRecieved5));
 audioRecievedFreq5 = fft(audioRecieved5) / fs;
 
 % Listen to multiplexed audio
-sound(real(audioRecieved5), fs);
+%sound(real(audioRecieved5), fs);
 
 % Highest pitched frequency of all 5 signals. 
 
@@ -263,6 +267,8 @@ impulse = [(1/ts), zeros(1, 49)];
 % Create round values for vectors
 sid = round(sid);
 fs = round(fs);
+
+% Need to transfer the h function with the f(t)
 
 %Use the channel feature to model the impulse response 
 channelOutput = channel(sid, impulse, fs);
@@ -312,7 +318,7 @@ cleanAudio = lowpass(demRevSignal, cutoffFreq, fs);
 cleanAudio = cleanAudio / max(abs(cleanAudio));
 
 % Listen to the denoised audio 
-sound(cleanAudio, fs);
+%sound(cleanAudio, fs);
 
 % Plot equalised signal in time and frequency domains
 figure;
@@ -338,7 +344,7 @@ cleanAudio2 = lowpass(demRevSignal2, cutoffFreq, fs);
 cleanAudio2 = cleanAudio2 / max(abs(cleanAudio2));
 
 % Listen to the denoised audio 
-sound(cleanAudio2, fs);
+%sound(cleanAudio2, fs);
 
 % Plot equalised signal in time and frequency domains
 figure;
@@ -364,7 +370,7 @@ cleanAudio3 = lowpass(demRevSignal3, cutoffFreq, fs);
 cleanAudio3 = cleanAudio3 / max(abs(cleanAudio3));
 
 % Listen to the denoised audio 
-sound(cleanAudio3, fs);
+%sound(cleanAudio3, fs);
 
 % Plot equalised signal in time and frequency domains
 figure;
@@ -389,7 +395,7 @@ cleanAudio4 = lowpass(demRevSignal4, cutoffFreq, fs);
 cleanAudio4 = cleanAudio4 / max(abs(cleanAudio4));
 
 % Listen to the denoised audio 
-sound(cleanAudio4, fs);
+%sound(cleanAudio4, fs);
 
 % Plot equalised signal in time and frequency domains
 figure;
@@ -407,6 +413,8 @@ title('Equalised signal in time domain');
 xlabel('Time (s)');
 ylabel('Amplitude');
 grid on;
+
+% Check the carrier frequency.
 %% Section 1.4 frequency 5 
 % Reverse distorion for frequency 5 
 demRevSignal5 = revAudioEqualized .* carrierModulation5;
@@ -414,7 +422,7 @@ cleanAudio5 = lowpass(demRevSignal5, cutoffFreq, fs);
 cleanAudio5 = cleanAudio5 / max(abs(cleanAudio5));
 
 % Listen to the denoised audio 
-sound(cleanAudio5, fs);
+%sound(cleanAudio5, fs);
 
 % Plot equalised signal in time and frequency domains
 figure;
@@ -468,13 +476,13 @@ finalAudio = ifft(CleanAudio);
 finalAudio = finalAudio / max(abs(finalAudio));
 
 % Listen to the clean audio signal
-sound(real(finalAudio), fs);
+sound(finalAudio, fs);
 
 % Plot in the time and frequency domain
 % Frequency domain
 figure;
 subplot(2, 1, 1);
-plot(freq, abs(fftshift(fft(finalAudio) / samples)));
+plot(freq, abs(fft(finalAudio) / samples));
 title('De-noised Frequency Domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
@@ -489,3 +497,5 @@ xlabel('Time (s)');
 ylabel('Amplitude');
 grid on;
 
+% Have I removed the signal rather than the noise? 
+% This appears to be fft shifted. 
