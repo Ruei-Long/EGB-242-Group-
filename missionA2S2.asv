@@ -34,7 +34,6 @@ title('Step Input vs Step Response')
 plot(tv025, heaviside(tv025));
 legend('Step Input', 'Step Response')
 xlabel('Time (s)')
-ylabel('\psi (t)')
+ylabel('')
 hold off
 
-%% Section 2.3 
