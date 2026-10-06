@@ -25,10 +25,10 @@ ts      = 1/fs;
 % Because our time vector is only valid for t >= 0, we do not need to
 % multiply by the heaviside function in this case. Therefore;
 
-stepresponse = (-4 + 2*tv025 + 4*exp(-0.5*tv025));
+OL_stepResponse = (-4 + 2*tv025 + 4*exp(-0.5*tv025));
 
-
-plot(tv025, stepresponse);
+figure(1)
+plot(tv025, OL_stepResponse);
 hold on
 title('Step Input vs Step Response')
 plot(tv025, heaviside(tv025));
@@ -38,3 +38,15 @@ ylabel('\psi (t)')
 hold off
 
 %% Section 2.3 
+s = tf('s');
+num = 1;
+den = [1, 0.5, 1];
+H = tf(num, den);
+
+inputStep = ones(1, samples);
+CL_stepResponse = lsim(H, inputStep, tv025);
+
+figure(2)
+plot(tv025, CL_stepResponse);
+
+ltiview(H);
