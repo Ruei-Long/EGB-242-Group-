@@ -27,3 +27,36 @@ function image = received_site_image(imagesReceived, num_image)
     figure;
     imshow(image);
 end
+%% Section 3.2
+time_domain_1 = Visualise_signal_time(imagesReceived,1);
+freq_domain_1 = Visualise_signal_freq(imagesReceived,1);
+
+%time domain plot
+function t = Visualise_signal_time(imagesReceived, im1D_num)
+    im1D = imagesReceived(im1D_num,:);
+    N = length(im1D); %length of image
+    samples_frequency = 1000; %pixel/sec
+    t = linspace(0, (N-1)/samples_frequency, N);
+    figure;
+    plot(t, im1D);
+    xlabel("Time (s)");
+    ylabel("Amplitude");
+    title("Recived Signal in Time Domain");
+    grid on;
+end
+
+%frequency domain
+function f = Visualise_signal_freq(imagesReceived, im1D_num)
+    im1D = imagesReceived(im1D_num,:);
+    N = length(im1D); %length of image
+    samples_frequency = 1000; %pixel/sec
+    f = (-N/2 : N/2 - 1) * (samples_frequency / N); %Hz
+    X = fft(im1D);
+    
+    figure;
+    plot(f, abs(fftshift(X))/N);
+    xlabel("Frequency (Hz)");
+    ylabel("Magnitude");
+    title("Recived Signal in Frequency Domain");
+    grid on;
+end
