@@ -191,24 +191,3 @@ filtering_image_4 = Active_filter1(imagesReceived,4);
 clean_image_4 = reshape(filtering_image_4, 480, 640);
 figure;
 imshow(clean_image_4);
-
-%%
-figure;
-s = tf('s');
-R1 = 1200;
-R2 = 1000;
-C1 = 10e-6;
-C2 = 4.7e-6;
-%num = sR1C1
-%den = s^2(R2R1C1C2)+s(R1R2C2+R1C2)+R1+1
-samples_frequency = 1000;
-num = R1*C1*s;
-den = s^2*(R2*R1*C1*C2)+s*(R1*C1+R1*C2+R2*C2)+1;
-H = num/den;
-bode(H);
-hold on;
-num = 1;
-den = s^2*(R1*R2*C1*C2)+s*(R1*C1+R1*C2+R2*C2)+1;
-A = num/den;
-bode(A);
-legend('A', 'B');

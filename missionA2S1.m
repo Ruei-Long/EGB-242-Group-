@@ -191,15 +191,13 @@ ylabel('Amplitude');
 grid on;
 
 %% Section 1.3
-% See tutorial 7 for a way to complete this assignment. 
+% See tutorial 8 for a way to complete this assignment. 
 % Define time period 
 ts = 1/fs;
 
 % Create an impulse
 impulse = zeros(1, samples);
 impulse(1) = 1/ts;
-
-% Need to transfer the h function with the f(t)
 
 %Use the channel feature to model the impulse response 
 channelOutput = channel(sid, impulse, fs);
@@ -224,10 +222,10 @@ legend('Channel frequency response', 'Audio multiplex spectrum');
 grid on;
 hold off;
 %% Section 1.4
-% Reverse distorion for frequency 1 
+% Convert the channel impulse from section 1.3 into the frequency domain 
 frequencyRev = fft(channelOutput, samples) / fs;
 
-% Create the frequency domain vector
+% Convert the audio channel into the frequency domain 
 revfft = fft(audioMultiplexNoisy) / fs;
 
 % Set the cut off frequency 
@@ -248,7 +246,7 @@ function [revAudio, revAudioEqualised, demRevSignal, cleanAudio, CleanAudio]...
     c = cos(2*pi*freq*timeVector);
     revAudio = revfft ./ frequencyRev;
     revAudioEqualised = ifft(revAudio) * fs;
-    demRevSignal = revAudioEqualised .* c;
+    demRevSignal = revAudioEqualised.* c;
     cleanAudio = lowpass(demRevSignal, cutoffFreq, fs);
     cleanAudio = highpass(cleanAudio, 2, fs);
     CleanAudio = cleanAudio / max(abs(cleanAudio));
