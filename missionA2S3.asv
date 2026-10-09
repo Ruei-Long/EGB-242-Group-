@@ -174,7 +174,8 @@ function f = Visualise_signal_clean_freq(clean_image)
     grid on;
 end
 
-%% Section 3.5 - filtering each image
+%% Section 3.5
+% filtering each image
 % image 2
 filtering_image_2 = Active_filter1(imagesReceived,2);
 clean_image_2 = reshape(filtering_image_2, 480, 640);
@@ -190,3 +191,14 @@ filtering_image_4 = Active_filter1(imagesReceived,4);
 clean_image_4 = reshape(filtering_image_4, 480, 640);
 figure;
 imshow(clean_image_4);
+
+%% time & frequency domain for each image after the filtering
+% image 2
+clean_time_domain_2 = Visualise_signal_clean_time(filtering_image_2);
+clean_freq_domain_2 = Visualise_signal_clean_freq(filtering_image_2);
+% image 3
+clean_time_domain_3 = Visualise_signal_clean_time(filtering_image_3);
+clean_freq_domain_3 = Visualise_signal_clean_freq(filtering_image_3);
+% image 4
+clean_time_domain_4 = Visualise_signal_clean_time(filtering_image_4);
+clean_freq_domain_4 = Visualise_signal_clean_freq(filtering_image_4);
