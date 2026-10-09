@@ -367,8 +367,10 @@ title('Equalised signal in time domain 72160Hz ');
 xlabel('Time (s)');
 ylabel('Amplitude');
 grid on;
-
 %% Section 1.5 
+impulseClean = [1/ts, zeros(1, samples -1)];
+h = audioChannel(impulseClean); 
+H = fft(h)/fs; 
 
 %% 1.5 CF1 clean audio signal
 %Listen to the audio signal 
