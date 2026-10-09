@@ -14,7 +14,12 @@ load('DataA2.mat')
 %% Section 1.1 plot audioMultiplexNoisy in frequency and time domain
 %Create a time vector
 samples = length(audioMultiplexNoisy);
-timeVector = linspace(0, samples/fs, samples);
+T = samples/fs;
+%timeVector = linspace(0, samples/fs, samples);
+%timeVector = (0:samples-1)/fs;
+
+timeVector = linspace(0, T, samples + 1); % trial to see if it helps thet time domain plot. 
+timeVector(end) = [];
 
 % Create a frequency vector
 freq = linspace(-fs/2, fs/2, samples + 1);
@@ -45,17 +50,17 @@ grid on;
 
 %% Section 1.2 with function block
 %Set the cutoff frequency
-cutoffFreq = 4000;
+cutoffFreq = 1000;
 
 % Using assignment 1 multiplexed system
 demultiplex = fft(audioMultiplexNoisy) / fs;
 
 % Define carrier frequency
-CF1 = 8210; 
-CF2 = 24190; 
-CF3 = 40210; 
-CF4 = 56290; 
-CF5 = 72160; 
+CF1 = 8210; %8210 Trial a different frequency
+CF2 = 24190; %24190
+CF3 = 40210; %40210
+CF4 = 56290; %56290
+CF5 = 72160; %72160
 
 % Create a function to modulate all frequencies using cos(2*pi*f*t);
 function [c, demodulatedSignal, audioReceived, ... 
@@ -65,7 +70,7 @@ function [c, demodulatedSignal, audioReceived, ...
     c = cos(2*pi*freq*timeVector);
     demodulatedSignal = signal.* c;
     audioReceived = lowpass(demodulatedSignal, cutoffFreq, fs);
-    audioReceived = detrend(audioReceived);% Trial
+    audioReceived = highpass(audioReceived, 2, fs);
     audioNormal = audioReceived/ max(abs(audioReceived));
     audioReceivedFreq = fft(audioReceived) / fs;
 
@@ -245,7 +250,7 @@ function [revAudio, revAudioEqualised, demRevSignal, cleanAudio, CleanAudio]...
     revAudioEqualised = ifft(revAudio) * fs;
     demRevSignal = revAudioEqualised .* c;
     cleanAudio = lowpass(demRevSignal, cutoffFreq, fs);
-    cleanAudio = detrend(cleanAudio);
+    cleanAudio = highpass(cleanAudio, 2, fs);
     CleanAudio = cleanAudio / max(abs(cleanAudio));
 
 end 
@@ -364,27 +369,8 @@ title('Equalised signal in time domain 72160Hz ');
 xlabel('Time (s)');
 ylabel('Amplitude');
 grid on;
+
 %% Section 1.5 
-% See tutorial 7 to complete the part. 
-% Estimate each channel's impulse and frequency response for equalisation
-[h2, H2, f2] = impulseFreqResponse(@System2, impulse, fs);
-[h3, H3, f3] = impulseFreqResponse(@System3, impulse, fs);
-[h4, H4, f4] = impulseFreqResponse(@System4, impulse, fs);
-[h5, H5, f5] = impulseFreqResponse(@System5, impulse, fs);
-[h6, H6, f6] = impulseFreqResponse(@System6, impulse, fs);
-
-% equalise and demodulate each carrier
-channelResponses = {H1, H2, H3, H4, H5};
-carrierFrequencies = [CF1, CF2, CF3, CF4, CF5];
-finalAudio = cell(1, 5);
-
-%% helper function
-function [h, H, f] = impulseFreqResponse(system, imp, fs)
-h = system(imp);
-H = fft(h) / fs;
-f = linspace(-fs/2, fs/2, length(h) + 1);
-f(end) = [];
-end
 
 %% 1.5 CF1 clean audio signal
 %Listen to the audio signal 
