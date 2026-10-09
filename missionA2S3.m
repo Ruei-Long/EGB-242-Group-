@@ -146,3 +146,35 @@ function im2D_output = Active_filter2(imagesReceived, im1D_num)
     a = lsim(H,im1D, t);
     im2D_output = reshape(a, 480, 640);
 end
+%% Section 3.4
+clean_time_domain_1 = Visualise_signal_clean_time(c);
+clean_freq_domain_1 = Visualise_signal_clean_freq(c);
+
+% Before the filter time domain plot
+function t = Visualise_signal_clean_time(clean_image)
+    N = length(clean_image); %length of image
+    samples_frequency = 1000; %pixel/sec
+    t = (0:N-1) / samples_frequency; 
+    %t = linspace(0, (N-1)/samples_frequency, N);
+    figure;
+    plot(t, clean_image);
+    xlabel("Time (s)");
+    ylabel("Amplitude");
+    title("Recived Signal in Time Domain");
+    grid on;
+end
+
+% frequency domain
+function f = Visualise_signal_clean_freq(clean_image)
+    N = length(clean_image); %length of image
+    samples_frequency = 1000; %pixel/sec
+    f = (-N/2 : N/2 - 1) * (samples_frequency / N); %Hz
+    X = fft(clean_image);
+    
+    figure;
+    plot(f, abs(fftshift(X))/N);
+    xlabel("Frequency (Hz)");
+    ylabel("Magnitude");
+    title("Recived Signal in Frequency Domain");
+    grid on;
+end
