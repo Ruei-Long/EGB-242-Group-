@@ -178,3 +178,33 @@ function f = Visualise_signal_clean_freq(clean_image)
     title("Recived Signal in Frequency Domain");
     grid on;
 end
+%% Section 3.5
+% time & frequency domain for each image before filtered
+%time_domain_2 = Visualise_signal_time(imagesReceived,2);
+%time_domain_3 = Visualise_signal_time(imagesReceived,3);
+%time_domain_4 = Visualise_signal_time(imagesReceived,4);
+%freq_domain_2 = Visualise_signal_freq(imagesReceived,2);
+%freq_domain_3 = Visualise_signal_freq(imagesReceived,3);
+%freq_domain_4 = Visualise_signal_freq(imagesReceived,4);
+
+%% filter the each image
+filter_image_2 = Active_filter1(imagesReceived,2);
+filter_image_3 = Active_filter1(imagesReceived,3);
+filter_image_4 = Active_filter1(imagesReceived,4);
+clean_image_2 = reshape(filter_image_2, 480, 640);
+clean_image_3 = reshape(filter_image_3, 480, 640);
+clean_image_4 = reshape(filter_image_4, 480, 640);
+figure;
+imshow(clean_image_2);
+figure;
+imshow(clean_image_3);
+figure;
+imshow(clean_image_4);
+
+%% time & frequency domain for each image after the filtering
+clean_time_domain_2 = Visualise_signal_clean_time(filter_image_2);
+clean_freq_domain_2 = Visualise_signal_clean_freq(filter_image_2);
+clean_time_domain_3 = Visualise_signal_clean_time(filter_image_3);
+clean_freq_domain_3 = Visualise_signal_clean_freq(filter_image_3);
+clean_time_domain_4 = Visualise_signal_clean_time(filter_image_4);
+clean_freq_domain_4 = Visualise_signal_clean_freq(filter_image_4);
