@@ -9,7 +9,6 @@ clear all; close all;
 load DataA2 imagesReceived;
 
 % Begin writing your MATLAB solution below this line.
-% fddsv
 %% Section 3.1
 im2D1 = received_site_image(imagesReceived, 1);
 im2D2 = received_site_image(imagesReceived, 2);
@@ -27,6 +26,7 @@ function image = received_site_image(imagesReceived, num_image)
     figure;
     imshow(image);
 end
+
 %% Section 3.2
 time_domain_1 = Visualise_signal_time(imagesReceived,1);
 freq_domain_1 = Visualise_signal_freq(imagesReceived,1);
@@ -60,6 +60,9 @@ function f = Visualise_signal_freq(imagesReceived, im1D_num)
     title("Recived Signal in Frequency Domain");
     grid on;
 end
+
+
+
 %% Section 3.3
 filter_image_1 = Active_filter1(imagesReceived,1);
 clean_image_1 = reshape(filter_image_1, 480, 640);
@@ -146,6 +149,7 @@ function im2D_output = Active_filter2(imagesReceived, im1D_num)
     a = lsim(H,im1D, t);
     im2D_output = reshape(a, 480, 640);
 end
+
 %% Section 3.4
 clean_time_domain_1 = Visualise_signal_clean_time(c);
 clean_freq_domain_1 = Visualise_signal_clean_freq(c);
@@ -178,6 +182,7 @@ function f = Visualise_signal_clean_freq(clean_image)
     title("Recived Signal in Frequency Domain");
     grid on;
 end
+
 %% Section 3.5
 % time & frequency domain for each image before filtered
 %time_domain_2 = Visualise_signal_time(imagesReceived,2);
