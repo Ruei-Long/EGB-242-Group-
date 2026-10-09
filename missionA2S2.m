@@ -52,56 +52,19 @@ plot(tv025, CL_stepResponse);
 
 %% Section 2.4 - Peak (Tp), Settling (Ts) time, percent overshoot (pcOS)
 
-a = 0.5; 
-b = 1;
+[omegan, zeta, Tp, Ts, pcOS] = transientSpecs(0.5, 1);
 
-omegan  = sqrt(b);          % natural frequency (rad/s)
-zeta    = a / (2*omegan);   % damping ratio
 
-Tp   = pi / (omegan*(sqrt(1 - zeta^2)));        % peak time
-Ts   = 4 / (zeta*omegan);                       % settling time
-pcOS = exp(-(zeta*pi)/(sqrt(1-zeta^2)))*100;    % percent overshoot
-
+% stepinfo(H)
 %% Section 2.5 - Investigating effects of gain blocks
-
-% 
-% % Kfwd = 1, sweeping Kfb
-% Kfb01   = tfeval(1, 0.1);
-% Kfb02   = tfeval(1, 0.2);
-% Kfb05   = tfeval(1, 0.5);
-% Kfb1    = tfeval(1, 1);
-% Kfb2    = tfeval(1, 2);
-% 
-% % Kfb = 1, sweeping Kfwd
-% Kfwd01  = tfeval(0.1, 1);
-% Kfwd02  = tfeval(0.2, 1);
-% Kfwd05  = tfeval(0.5, 1);
-% Kfwd1   = tfeval(1, 1);
-% Kfwd2   = tfeval(2, 1);
-% 
-% % Step response of Kfb sweeps
-% SRKfb01 = lsim(Kfb01, inputStep, tv025);
-% SRKfb02 = lsim(Kfb02, inputStep, tv025);
-% SRKfb05 = lsim(Kfb05, inputStep, tv025);
-% SRKfb1  = lsim(Kfb1, inputStep, tv025);
-% SRKfb2  = lsim(Kfb2, inputStep, tv025);
-% 
-% % Step response of Kfwd sweeps
-% SRKfwd01 = lsim(Kfwd01, inputStep, tv025);
-% SRKfwd02 = lsim(Kfwd01, inputStep, tv025);
-% SRKfwd05 = lsim(Kfwd01, inputStep, tv025);
-% SRKfwd1  = lsim(Kfwd01, inputStep, tv025);
-% SRKfwd2  = lsim(Kfwd01, inputStep, tv025);
-
-% Let's use a for loop to do this instead
 
 gains   = [0.1, 0.2, 0.5, 1, 2];    % array of gain values
 Kfwd    = cell(1, 5); % cell needed as normal arrays cant store tf objects
 Kfb     = cell(1, 5);
 simKfb  = cell(1, 5); % cell needed to store each vector in an array
 simKfwd = cell(1, 5);
+
 for n = 1:5 % for each entry in gains, execute the following
-    
     % Evaluating transfer functions
     [Kfb{n}, simKfb{n}]  = ... 
         tfeval(1, gains(n), tv025, inputStep);  % sweeping Kfb 
@@ -111,21 +74,38 @@ end
 
 figure()
 subplot(2,1,1);
+title('Effect of K_{fb} on Step Response')
 hold on;
 
 for n = 1:5
     plot(tv025, simKfb{n})
 end
 
+legend('K_{fb} = 0.1', 'K_{fb} = 0.2', 'K_{fb} = 0.5', ... 
+       'K_{fb} = 1', 'K_{fb} = 2') 
 hold off;
 
 subplot(2,1,2);
+title('Effect of K_{fwd} on Step Response')
 hold on;
 for n = 1:5
     plot(tv025, simKfwd{n})
 end
- 
+
+legend('K_{fwd} = 0.1', 'K_{fwd} = 0.2', 'K_{fwd} = 0.5', ... 
+       'K_{fwd} = 1', 'K_{fwd} = 2')
 hold off;
+
+%% Section 2.6 - Selecting Gain Values
+
+% Peak time defined by colleague as Tp = 14
+
+[cameraTF, cameraTFsim] = tfeval(0.1, 1, tv025, inputStep);
+
+figure()
+plot(tv025, cameraTFsim);
+
+[omeganctf, zetactf, Tpctf, Tsctf, pcOSctf] = transientSpecs(0.5, 0.1);
 
 
 
@@ -135,9 +115,17 @@ function [Psi, sim] = tfeval(Kfwd, Kfb, timeVector, input)
 
 num = Kfwd;
 den = [1, 0.5, Kfwd*Kfb];
-
 Psi = tf(num, den);
-
 sim = lsim(Psi, input, timeVector);
+
+end
+
+function [omegan, zeta, Tp, Ts, pcOS] = transientSpecs(a, b)
+
+omegan  = sqrt(b);          % natural frequency (rad/s)
+zeta    = a / (2*omegan);   % damping ratio
+Tp   = pi / (omegan*(sqrt(1 - zeta^2)));        % peak time
+Ts   = 4 / (zeta*omegan);                       % settling time
+pcOS = exp(-(zeta*pi)/(sqrt(1-zeta^2)))*100;    % percent overshoot
 
 end
