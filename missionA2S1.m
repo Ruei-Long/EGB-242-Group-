@@ -216,71 +216,38 @@ ylabel('Amplitude');
 grid on;
 
 %% Section 1.3
-% See tutorial 8 for a way to complete this assignment. 
-% Define time period 
-ts = 1/fs;
+samples = length(audioMultiplexNoisy);
 
-% Create an impulse
-impulse = [1/ts, zeros(1, samples - 1)];
-
-%Use the channel feature to model the impulse response 
-channelOutput = channel(sid, impulse, fs);
-
-%
-% H = abs(fftshift(channelFreq));
-% A = abs(fftshift(frequencySpectrum));
-% 
-% HdB = amp2dB(H/max(H));
-% AdB = amp2dB(A/max(A));
-
-%Find the frequency response and create the frequency vector 
-channelFreq = normalised_fft(channelOutput);
-channelFrequency = linspace(-fs/2, fs/2, length(channelOutput) + 1);
-channelFrequency(end) = [];
-
-%Plotting both the magnitude spectrum and multiplexed audio on the same
-%graph
-figure;
-hold on;
-plot(channelFrequency, abs(fftshift(channelFreq)));
-plot(freq, abs(fftshift(frequencySpectrum)), '--');
-title('Channel Frequency response and audioMultiplexNoisy');
-xlabel('Frequency Hz');
-ylabel('Magnitude');
-legend('Channel frequency response', 'Audio multiplex spectrum');
-%ylim([0, 0.05]);
-%xlim([0, 0.05]);
-grid on;
-hold off;
-%% Section 1.4
 % Convert the channel impulse from section 1.3 into the frequency domain 
-frequencyRev = fft(channelOutput, samples) / fs;
+frequencyRev = fft(channelOutput, samples); %/ fs;
 
 % Convert the audio channel into the frequency domain 
-revfft = fft(audioMultiplexNoisy) / fs;
+revfft = fft(audioMultiplexNoisy, samples); %/ fs;
 
-% Set the cut off frequency for each carrier frequency 
-cutoffFreq1 = 4210;
-cutoffFreq2 = 20190;
-cutoffFreq3 = 36210;
-cutoffFreq4 = 52290;
-cutoffFreq5 = 68160;
+% Reverse channel distortion
+revAudio = revfft ./ frequencyRev;
+revAudioEqualised = ifft(revAudio); %* fs;
 
 % Set the carrier frequency
 CF1 = 8210; 
 CF2 = 24190; 
 CF3 = 40210; 
 CF4 = 56290; 
-CF5 = 72160; 
+CF5 = 72160;
+
+% Set the cutoff frequencies
+cutoffFreq1 = 4210;
+cutoffFreq2 = 20190;
+cutoffFreq3 = 36210;
+cutoffFreq4 = 52290;
+cutoffFreq5 = 68160;
 
 % Create a function for reverse distortion
-function [revAudio, revAudioEqualised, demRevSignal, cleanAudio, CleanAudio]...
-    = reverseDistortion(freq, cutoffFreq, fs, timeVector, frequencyRev, revfft)
+function [demRevSignal, cleanAudio, CleanAudio]...
+    = reverseDistortion(freq, revAudioEqualised, cutoffFreq, fs, timeVector)
 
     % Reverse the channel distortion of the mulitplexed signal
     c = cos(2*pi*freq*timeVector);
-    revAudio = revfft ./ frequencyRev;
-    revAudioEqualised = ifft(revAudio) * fs;
     demRevSignal = revAudioEqualised.* c;
     cleanAudio = lowpass(demRevSignal, cutoffFreq, fs);
     cleanAudio = cleanAudio - mean(cleanAudio);
@@ -288,16 +255,16 @@ function [revAudio, revAudioEqualised, demRevSignal, cleanAudio, CleanAudio]...
 
 end 
 
-[revAudio1, revAudioEqualised1, demRevSignal1, cleanAudio1, CleanAudio1]...
-    = reverseDistortion(CF1, cutoffFreq1, fs, timeVector, frequencyRev, revfft);
-[revAudio2, revAudioEqualised2, demRevSignal2, cleanAudio2, CleanAudio2]...
-    = reverseDistortion(CF2, cutoffFreq2, fs, timeVector, frequencyRev, revfft);
-[revAudio3, revAudioEqualised3, demRevSignal3, cleanAudio3, CleanAudio3]...
-    = reverseDistortion(CF3, cutoffFreq3, fs, timeVector, frequencyRev, revfft);
-[revAudio4, revAudioEqualised4, demRevSignal4, cleanAudio4, CleanAudio4]...
-    = reverseDistortion(CF4, cutoffFreq4, fs, timeVector, frequencyRev, revfft);
-[revAudio5, revAudioEqualised5, demRevSignal5, cleanAudio5, CleanAudio5]...
-    = reverseDistortion(CF5, cutoffFreq5, fs, timeVector, frequencyRev, revfft);
+[demRevSignal1, cleanAudio1, CleanAudio1]...
+    = reverseDistortion(CF1, revAudioEqualised, cutoffFreq1, fs, timeVector);
+[demRevSignal2, cleanAudio2, CleanAudio2]...
+    = reverseDistortion(CF2, revAudioEqualised, cutoffFreq2, fs, timeVector);
+[demRevSignal3, cleanAudio3, CleanAudio3]...
+    = reverseDistortion(CF3, revAudioEqualised, cutoffFreq3, fs, timeVector); 
+[demRevSignal4, cleanAudio4, CleanAudio4]...
+    = reverseDistortion(CF4, revAudioEqualised, cutoffFreq4, fs, timeVector);
+[demRevSignal5, cleanAudio5, CleanAudio5]...
+    = reverseDistortion(CF5, revAudioEqualised, cutoffFreq5, fs, timeVector);
 
 %% Section 1.4 CF1 
 %Listen to audio signal 
