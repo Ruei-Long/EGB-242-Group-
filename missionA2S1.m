@@ -44,7 +44,7 @@ plot(freq, amp2dB(abs(fftshift(frequencySpectrum))));
 title('audioMultiplexNoisy in Frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
-ylim([-110 0])
+ylim([-150 0])
 grid on;
 
 %%
@@ -239,13 +239,13 @@ channelFrequency(end) = [];
 %graph
 figure;
 hold on;
-plot(channelFrequency, abs(fftshift(channelFreq)));
-plot(freq, abs(fftshift(frequencySpectrum)), '--');
+plot(channelFrequency, amp2dB(abs(fftshift(channelFreq))));
+plot(freq, amp2dB(abs(fftshift(frequencySpectrum))), '--');
 title('Channel Frequency response and audioMultiplexNoisy');
 xlabel('Frequency Hz');
 ylabel('Magnitude');
 legend('Channel frequency response', 'Audio multiplex spectrum');
-%ylim([0, 0.05]);
+%ylim([0, 0.2]);
 %xlim([0, 0.05]);
 grid on;
 hold off;
