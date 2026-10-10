@@ -224,11 +224,7 @@ impulse = [1/ts, zeros(1, samples - 1)];
 channelOutput = channel(sid, impulse, fs);
 
 %
-% H = abs(fftshift(channelFreq));
-% A = abs(fftshift(frequencySpectrum));
-% 
-% HdB = amp2dB(H/max(H));
-% AdB = amp2dB(A/max(A));
+
 
 %Find the frequency response and create the frequency vector 
 channelFreq = normalised_fft(channelOutput);
@@ -239,8 +235,8 @@ channelFrequency(end) = [];
 %graph
 figure;
 hold on;
-plot(channelFrequency, abs(fftshift(channelFreq)));
-plot(freq, abs(fftshift(frequencySpectrum)), '--');
+plot(channelFrequency, fftshift(abs(channelFreq)));
+plot(freq, fftshift(abs(frequencySpectrum), '--');
 title('Channel Frequency response and audioMultiplexNoisy');
 xlabel('Frequency Hz');
 ylabel('Magnitude');
