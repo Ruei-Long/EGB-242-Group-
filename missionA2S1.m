@@ -41,7 +41,7 @@ plot(freq, amp2dB(abs(fftshift(frequencySpectrum))));
 title('audioMultiplexNoisy in Frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
-ylim([-110 0])
+ylim([-150 0])
 grid on;
 
 % There are 5 carrier frequencies in the frequency domain.  The plot above
@@ -218,6 +218,39 @@ grid on;
 %% Section 1.3
 samples = length(audioMultiplexNoisy);
 
+% Create an impulse
+impulse = [1/ts, zeros(1, samples - 1)];
+
+%Use the channel feature to model the impulse response 
+channelOutput = channel(sid, impulse, fs);
+
+%
+% H = abs(fftshift(channelFreq));
+% A = abs(fftshift(frequencySpectrum));
+% 
+% HdB = amp2dB(H/max(H));
+% AdB = amp2dB(A/max(A));
+
+%Find the frequency response and create the frequency vector 
+channelFreq = normalised_fft(channelOutput);
+channelFrequency = linspace(-fs/2, fs/2, length(channelOutput) + 1);
+channelFrequency(end) = [];
+
+%Plotting both the magnitude spectrum and multiplexed audio on the same
+graph
+figure;
+hold on;
+plot(channelFrequency, amp2dB(abs(fftshift(channelFreq))));
+plot(freq, amp2dB(abs(fftshift(frequencySpectrum))), '--');
+title('Channel Frequency response and audioMultiplexNoisy');
+xlabel('Frequency Hz');
+ylabel('Magnitude');
+legend('Channel frequency response', 'Audio multiplex spectrum');
+%ylim([0, 0.2]);
+%xlim([0, 0.05]);
+grid on;
+hold off;
+%% Section 1.4
 % Convert the channel impulse from section 1.3 into the frequency domain 
 frequencyRev = fft(channelOutput, samples); %/ fs;
 
