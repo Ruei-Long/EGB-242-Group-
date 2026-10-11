@@ -292,7 +292,7 @@ time(end) = [];
 % Create a frequency vector
 freqVec = linspace(-fs/2, fs/2, impulseLength + 1);
 freqVec(end) = [];
-freq_vector = freq_vector'; 
+freqVec = freqVec';
 
 % Create a for loop to modulate all carrier frequencies
 cleanAudio = cell(1, 5); 
@@ -302,10 +302,11 @@ for i = 1:5
     passband = [carrFreqArray(i) - cutofffreq, carrFreqArray(i) + cutofffreq];
     
     % Use a bandpass filter to isolate clean audio
-    audioBand = bandpass(signal_input, passband, fs);    
+    audioBand = bandpass(impulseAudio, passband, fs);    
 
     % Modulate the audio to 0Hz with the carrier modulation
-    c = cos(2*pi*carrFreqArray(i)*t);
+    c = cos(2*pi*carrFreqArray(i)*time);
+    c = c (:);
     demsignal = audioBand .* c;    
  
     % Take the full signal into the frequency domain
@@ -317,8 +318,8 @@ for i = 1:5
     tolerance = 400; 
 
     % Adjust vector to remove noisy signals
-    noiseSpikes = (abs(freq_vector) >= (noiseSpike - tolerance)) & ...
-        (abs(freq_vector) <= (noiseSpike + tolerance));  
+    noiseSpikes = (abs(freqVec) >= (noiseSpike - tolerance)) & ...
+        (abs(freqVec) <= (noiseSpike + tolerance));  
     ZeroShift(noiseSpikes) = 0; % Zero out noisy freq
 
     figure
