@@ -52,10 +52,8 @@ plot(tv025, CL_stepResponse);
 
 %% Section 2.4 - Peak (Tp), Settling (Ts) time, percent overshoot (pcOS)
 
-[omegan, zeta, Tp, Ts, pcOS] = transientSpecs(0.5, 1);
+stepinfo(H)
 
-
-% stepinfo(H)
 %% Section 2.5 - Investigating effects of gain blocks
 
 gains   = [0.1, 0.2, 0.5, 1, 2];    % array of gain values
@@ -100,13 +98,75 @@ hold off;
 
 % Peak time defined by colleague as Tp = 14
 
-[cameraTF, cameraTFsim] = tfeval(0.1, 1, tv025, inputStep);
 
-figure()
-plot(tv025, cameraTFsim);
 
-[omeganctf, zetactf, Tpctf, Tsctf, pcOSctf] = transientSpecs(0.5, 0.1);
 
+%stepinfo(cameraTF);
+
+% This while loop will find the first value of Tp that is approximately
+% equal to 14. Given fb is set to 1.
+
+counter = 1;
+
+% Initialising 'testTF' to the critically damped case
+[testTF, testTFsim] = tfeval(0.625, 2*pi, tv025, inputStep);
+
+% Initialising Tp 
+Tp = stepinfo(testTF).PeakTime;
+
+% Brute-Force while loop, numerical evaluation.
+
+resolution = 2e4;
+t = linspace(0, T, resolution);
+inputStepR = ones(1, resolution);
+
+% A constant to ensure the counter starts at 25 (not wasting cycles)
+counter = 0.078292 * resolution; 
+
+while isapprox(Tp, 14, 'veryloose' ) ~= 1
+    
+    
+    counter_descale = counter/resolution;
+    
+    [testTF, testTFsim] = tfeval(counter_descale, 1, t, inputStepR);
+    Tp = stepinfo(testTFsim, t).PeakTime;
+
+    counter = counter + 1;
+
+end
+
+disp(counter_descale)
+
+% Setting Kfb to 1, we find the value to achieve ~14s Tp is approx 0.1128
+% This scaling factor may now be used to find the value of Kfwd for our 
+% intended final value.
+
+% Given that, final value = 1/Kfb. We can plug any value of Kfb into this
+% and multiply by 0.1128 and we will have a step response with a Peak-Time
+% approximately equal to 14s. 
+
+% Therefore (given this is an underdamped case and the math is valid),
+% we elect to use the calculated value, rather than the numerical above.
+
+Kfwd_const = 1*((0.5^2)/4 + pi^2/(14^2));
+
+ltiview(cameraTF);
+stepinfo(cameraTF)
+
+%%
+Kfb_scalar = 2*pi;
+
+test = tfeval(Kfwd_const*Kfb_scalar, 1/Kfb_scalar, tv025, inputStep);
+ltiview(test);
+stepinfo(test)
+Tp = stepinfo(test).PeakTime;
+
+%% Section 2.7
+
+startVoltage = 1/12;
+endVoltage   = 7/12;     
+
+[startIm, finalIm] = cameraPan(startVoltage, endVoltage, test);
 
 
 %% Function Definitions
@@ -117,15 +177,5 @@ num = Kfwd;
 den = [1, 0.5, Kfwd*Kfb];
 Psi = tf(num, den);
 sim = lsim(Psi, input, timeVector);
-
-end
-
-function [omegan, zeta, Tp, Ts, pcOS] = transientSpecs(a, b)
-
-omegan  = sqrt(b);          % natural frequency (rad/s)
-zeta    = a / (2*omegan);   % damping ratio
-Tp   = pi / (omegan*(sqrt(1 - zeta^2)));        % peak time
-Ts   = 4 / (zeta*omegan);                       % settling time
-pcOS = exp(-(zeta*pi)/(sqrt(1-zeta^2)))*100;    % percent overshoot
 
 end
