@@ -104,113 +104,56 @@ end
 [C5, demod5, audioreceived5, audioNormal5, audioReceivedFreq5] = ...
     carrierFreq(CF5, timeVector, audioMultiplexNoisy, cutoffFreq5, fs);
 
-%% 1.2 plot frequency 8210
+%% 1.2 Plotting 
+% Make an array of plotting values
+plotFreq = {audioReceivedFreq1, audioReceivedFreq2, audioReceivedFreq3, ...
+    audioReceivedFreq4, audioReceivedFreq5};
+
+plotTime = {audioreceived1, audioreceived2, audioreceived3, audioreceived4...
+    , audioreceived5};
+
+plot1_2 = cell(1, 5);
+
+for i = 1:5
+
+    figure;
+    subplot(2, 1, 1);
+    plot(freq, amp2dB(fftshift(plotFreq{i})));
+    title('Frequency domain');
+    xlabel('Frequency (Hz)');
+    ylabel('Magnitude (dB)');
+    xlim([-cutoffFreq1, cutoffFreq1]);
+    ylim([-180 -20])
+    grid on;
+
+    subplot(2, 1, 2);
+    plot(timeVector, plotTime{1});
+    title('Time domain');
+    xlabel('Time (s)');
+    ylabel('Amplitude');
+    grid on;
+
+end 
+
+%% 1.2 Carrier 1 listen
 % Listen to the sound of 8210 Hz
-%sound(audioreceived1, fs);
+sound(audioreceived1, fs);
 
-% Plot the time and Frequency domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(audioReceivedFreq1)));
-title('Frequency domain of 8210 Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq1, cutoffFreq1]);
-ylim([-180 -20])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, audioreceived1);
-title('Time domain of 8210Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-%% 1.2 plot frequency 24190 
+%% 1.2 Carrier 2 listen
 % Listen to the sound of 24190 Hz
-%sound(audioreceived2, fs);
+sound(audioreceived2, fs);
 
-% Plot the frequency and time domain 
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(audioReceivedFreq2)));
-title('Frequency domain of 24190 Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq2, cutoffFreq2]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, audioreceived2);
-title('Time domain of 24190 Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-%% 1.2 plot frequency 40210
+%% 1.2 Carrier 3 listen
 % Listen to the sound of 40210 Hz
-%sound(audioreceived3, fs);
+sound(audioreceived3, fs);
 
-% Plot the time and frequency domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(audioReceivedFreq3)));
-title('Frequency domain of 40210 Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq3, cutoffFreq3]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, audioreceived3);
-title('Time domain of 40210 Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-%% 1.2 plot frequency 56290 
+%% 1.2 Carrier 4 listen
 % Listen to the sound of 56290 Hz
-%sound(audioreceived4, fs);
+sound(audioreceived4, fs);
 
-%Plot the frequency and time domain 
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(audioReceivedFreq4)));
-title('Frequency domain of 56290 Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq4, cutoffFreq4]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, audioreceived4);
-title('Time domain of 56290 Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-%% 1.2 plot frequency 72160 
-% Listen to the 72160 Hz
-%sound(audioreceived5, fs);
-
-% Plot the time and frequency domain 
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(audioReceivedFreq5)));
-title('Frequency domain of 72160 Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq5, cutoffFreq5]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, audioreceived5);
-title('Time domain of 72160 Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
+%% 1.2 Carrier 5 listen
+% Listen to the sound of 72160 Hz
+sound(audioreceived5, fs);
 
 %% Section 1.3
 % Create an impulse
@@ -288,114 +231,51 @@ end
     = reverseDistortion(CF4, revAudioEqualised, cutoffFreq4, fs, timeVector);
 [demRevSignal5, cleanAudio5, CleanAudio5]...
     = reverseDistortion(CF5, revAudioEqualised, cutoffFreq5, fs, timeVector);
+
+%% 1.4 Plotting 
+% Make an array of plotting values
+plot1_4 = {CleanAudio1, CleanAudio2, CleanAudio3, ...
+    CleanAudio4, CleanAudio5};
+
+for i = 1:5
+
+    figure;
+    subplot(2, 1, 1);
+    plot(freq, amp2dB(fftshift(fft(plot1_4{i}) / samples)));
+    title('Equalised signal in frequency domain');
+    xlabel('Frequency (Hz)');
+    ylabel('Magnitude (dB)');
+    xlim([-cutoffFreq1, cutoffFreq1]);
+    ylim([-180 -20])
+    grid on;
+
+    subplot(2, 1, 2);
+    plot(timeVector, plot1_4{i});
+    title('Equalised signal in time domain');
+    xlabel('Time (s)');
+    ylabel('Amplitude');
+    grid on;
+
+end 
 %% Section 1.4 CF1 
 %Listen to audio signal 
-%sound(CleanAudio1, fs);
+sound(CleanAudio1, fs);
 
-% Plot in the frequency and time domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(fft(CleanAudio1) / samples)));
-title('Equalised signal in frequency domain for 8210Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq1, cutoffFreq1]);
-ylim([-180 -20])
-grid on;
+%% Section 1.4 CF2 
+%Listen to audio signal 
+sound(CleanAudio2, fs);
 
-subplot(2, 1, 2);
-plot(timeVector, CleanAudio1);
-title('Equalised signal in time domain for 8210Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
-
-%% Section 1.4 CF2 2 
-%Listen to audio signal
-%sound(CleanAudio2, fs)
-
-% Plot in the frequency and time domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(fft(CleanAudio2) / samples)));
-title('Equalised signal in frequency domain for 24190Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq2, cutoffFreq2]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, CleanAudio2);
-title('Equalised signal in time domain 24190Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
 %% Section 1.4 CF3 
-% Listen to audio signal 
-%sound(CleanAudio3, fs);
-
-% Plot in the frequency and time domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(fft(CleanAudio3) / samples)));
-title('Equalised signal in frequency domain 40210Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq3, cutoffFreq3]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, CleanAudio3);
-title('Equalised signal in time domain 40210Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
+%Listen to audio signal 
+sound(CleanAudio3, fs);
 
 %% Section 1.4 CF4 
 %Listen to audio signal 
-%sound(CleanAudio4, fs);
-
-% Plot in the frequency and time domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(fft(CleanAudio4) / samples)));
-title('Equalised signal in frequency domain 56290Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq4, cutoffFreq4]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, CleanAudio4);
-title('Equalised signal in time domain 56290Hz');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
+sound(CleanAudio4, fs);
 
 %% Section 1.4 CF5 
 %Listen to audio signal 
-%sound(CleanAudio5, fs);
-
-% Plot in the frequency and time domain
-figure;
-subplot(2, 1, 1);
-plot(freq, amp2dB(fftshift(fft(CleanAudio5) / samples)));
-title('Equalised signal in frequency domain 72160Hz');
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-xlim([-cutoffFreq5, cutoffFreq5]);
-ylim([-200, 0])
-grid on;
-
-subplot(2, 1, 2);
-plot(timeVector, CleanAudio5);
-title('Equalised signal in time domain 72160Hz ');
-xlabel('Time (s)');
-ylabel('Amplitude');
-grid on;
+sound(CleanAudio5, fs);
 
 %% Section 1.5 - Ringing-Free Frequency Domain Noise Removal
 % Set the cutoff frequency
