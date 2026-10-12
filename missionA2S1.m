@@ -247,147 +247,56 @@ for i = 1:5
 end 
 %% Section 1.4 CF1 
 %Listen to audio signal 
-sound(audioclean1_t, fs);
+%sound(audioclean1_t, fs);
 
 %% Section 1.4 CF2 
 %Listen to audio signal 
-sound(audioclean2_t, fs);
+%sound(audioclean2_t, fs);
 
 %% Section 1.4 CF3 
 %Listen to audio signal 
-sound(audioclean3_t, fs);
+%sound(audioclean3_t, fs);
 
 %% Section 1.4 CF4 
 %Listen to audio signal 
-sound(audioclean4_t, fs);
+%sound(audioclean4_t, fs);
 
 %% Section 1.4 CF5 
 %Listen to audio signal 
-sound(audioclean5_t, fs);
+%sound(audioclean5_t, fs);
 
-%% Section 1.5 - Ringing-Free Frequency Domain Noise Removal
-% Set the cutoff frequency
-cutofffreq = 4000; 
-carrFreqArray = [8210, 24190, 40210, 56290, 72160]; 
-
-impulseAudio = audioequalised_t(:); 
-impulseLength = length(impulseAudio); 
-
-% Create a time vector
-time = linspace(0, T, impulseLength + 1);
-time(end) = [];
-
-% Create a frequency vector
-freqVec = linspace(-fs/2, fs/2, impulseLength + 1);
-freqVec(end) = [];
-freqVec = freqVec';
-
-% Create a for loop to modulate all carrier frequencies
-cleanAudio = cell(1, 5); 
-
-for i = 1:5
-    % Create a vector with the cut off frequency
-    passband = [carrFreqArray(i) - cutofffreq, carrFreqArray(i) + cutofffreq];
-    
-    % Use a bandpass filter to isolate clean audio
-    audioBand = bandpass(impulseAudio, passband, fs);    
-
-    % Modulate the audio to 0Hz with the carrier modulation
-    c = cos(2*pi*carrFreqArray(i)*time);
-    c = c (:);
-    demsignal = audioBand .* c;    
- 
-    % Take the full signal into the frequency domain
-    ZeroShift = fftshift(fft(demsignal)); 
-
-   % From analysing all the plots in section 1.4 it was identified that
-   % all the carrier frequencies had noise from 2200 - 2900 Hz
-    noiseSpike = 2600; 
-    tolerance = 400; 
-
-    % Adjust vector to remove noisy signals
-    noiseSpikes = (abs(freqVec) >= (noiseSpike - tolerance)) & ...
-        (abs(freqVec) <= (noiseSpike + tolerance));  
-    ZeroShift(noiseSpikes) = 0; % Zero out noisy freq
-
-    figure
-    plot(freqVec, amp2dB(abs(ZeroShift)));
-    title('Final Audio in the Frequency Domain');
-    xlabel('Frequency Hz');
-    ylabel('Magnitude dB');
-    grid on;
-    xlim([-cutofffreq, cutofffreq]);
-
-    % Convert Back to the time domain
-    finalTime = ifft(ifftshift(ZeroShift));
-
-    % Step 4: Lowpass filter the reconstructed signal to clean up edges
-    %cleanAudio{i} = lowpass(finalTime, cutofffreq, fs);
-       
-end
-
-%% Alternate Approach
-
-plot1_5 = {audioclean1_f, audioclean2_f, audioclean3_f, audioclean4_f, ...
-    audioclean5_f};
-
-for i = 1:5
-
-figure()
-subplot(2,1,1)
-plot(fA, abs(fftshift(plot1_5{i})));
-hold on
-subplot(2,1,2)
-plot(fA, amp2dB(abs(fftshift(plot1_5{i}))));
-
-end
+%% Section 1.5 
 
 % Frequency with which we search above for single-tone components
 initial_f = 2000;
 
+[cleaned_signal_t1, Cleaned_Signal_f1] = ...
+    removetones(audioclean1_f, fA, initial_f, cutoffFreq1, fs);
+[cleaned_signal_t2, Cleaned_Signal_f2] = ...
+    removetones(audioclean2_f, fA, initial_f, cutoffFreq2, fs);
+[cleaned_signal_t3, Cleaned_Signal_f3] = ...
+    removetones(audioclean3_f, fA, initial_f, cutoffFreq3, fs);
+[cleaned_signal_t4, Cleaned_Signal_f4] = ...
+    removetones(audioclean4_f, fA, initial_f, cutoffFreq4, fs);
+[cleaned_signal_t5, Cleaned_Signal_f5] = ...
+    removetones(audioclean5_f, fA, initial_f, cutoffFreq5, fs);
 
-fftshifted = abs(fftshift(audioclean1_f));
-delta_f = fs/length(fA);
-DC_OHz = 1920001;
-freqbin(DC_OHz, 2978);
+plot1_5 = {cleaned_signal_t1, cleaned_signal_t2, cleaned_signal_t3, ...
+    cleaned_signal_t4, cleaned_signal_t5};
 
-removetones(input, fA, initial_f)
+plot1_6 = {Cleaned_Signal_f1, Cleaned_Signal_f2, Cleaned_Signal_f3, ...
+    Cleaned_Signal_f4, Cleaned_Signal_f5};
 
-for i = 1:length(fA)
-    if abs(fA(i)) > initial_f
-        if abs(fftshifted(i)) > 0.02
-            removefreq = i; 
-            disp(i)
-        end
-    end
-end    
+for i = 1:5
 
-    
+    figure()
+    subplot(2,1,1)
+    plot(fA, amp2dB(abs(fftshift(plot1_5{i}))));
+    hold on
+    subplot(2,1,2)
+    plot(timeVector, plot1_6{i});
 
-%% Play the desired audio for carrier Freq 1 
-ChooseAudio = cleanAudio{1};
-FinalAudio = ChooseAudio / max(abs(ChooseAudio));
-sound(FinalAudio, fs);
-
-%% Play the desired audio for carrier Freq 2
-ChooseAudio = cleanAudio{2};
-FinalAudio = ChooseAudio / max(abs(ChooseAudio));
-sound(FinalAudio, fs);
-
-%% Play the desired audio for carrier Freq 3
-ChooseAudio = cleanAudio{3};
-FinalAudio = ChooseAudio / max(abs(ChooseAudio));
-sound(FinalAudio, fs);
-
-%% Play the desired audio for carrier Freq 4
-ChooseAudio = cleanAudio{4};
-FinalAudio = ChooseAudio / max(abs(ChooseAudio));
-sound(FinalAudio, fs);
-
-%% Play the desired audio for carrier Freq 5
-ChooseAudio = cleanAudio{5};
-FinalAudio = ChooseAudio / max(abs(ChooseAudio));
-sound(FinalAudio, fs);
+end
 
 %% Function definitions
 
@@ -433,10 +342,15 @@ end
 
 % Function for finding single-tone frequencies
 
-function cleaned_signal = removetones(input, fA, initial_f, threshold)
+function [Cleaned_Signal_f, cleaned_signal_t] = ... 
+    removetones(input, fA, initial_f, LPFcutoff, fs)
 
     % input must be shifted for following arithmetic to function correctly
-    fftshifted = abs(fftshift(input));
+    fftshifted = fftshift(input);
+
+    % the threshold is set to a ridiculous 500 times the mean value.
+    % any frequency above this value will be set to 0. 
+    threshold = 500*mean(abs(fftshifted));
 
     % for the length of the supplied frequency vector
     for i = 1:length(fA)
@@ -444,13 +358,21 @@ function cleaned_signal = removetones(input, fA, initial_f, threshold)
         % the supplied initial frequency 
         if abs(fA(i)) > initial_f
             % AND if that indexed value is greater than the threshold 
+            % Remove the frequency corresponding to that index
             if abs(fftshifted(i)) > threshold
                 removefreq = i;
-                % currently will display the index but I will edit this
-                % to remove it instead
-                disp(i)
+                % disp(i); % debug display 
+                % (uncomment to see indices and verify correct frequencies)
+                fftshifted(removefreq) = 0;
+                % disp(fftshifted(removefreq)); % also a debug 
+                
             end
         end
     end
-
+    cleaned_signal_t = ... 
+        ifft(ifftshift(fftshifted)) * length(input);
+    cleaned_signal_t = ... 
+        lowpass(cleaned_signal_t, LPFcutoff,fs, "Steepness", 0.99);
+    Cleaned_Signal_f = ...
+        normalised_fft(cleaned_signal_t); 
 end
