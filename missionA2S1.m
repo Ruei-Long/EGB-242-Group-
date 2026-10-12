@@ -19,12 +19,13 @@ timeVector = linspace(0, T, samples + 1); % trial to see if it helps the time do
 timeVector(end) = [];
 
 % Create a frequency vector
-freq = linspace(-fs/2, fs/2, samples + 1);
-freq(end) = [];
+
+fA = linspace(-fs/2, fs/2, samples + 1);
+fA(end) = [];
 
 % Convert to the frequency domain
 %frequencySpectrum = fftshift(fft(audioMultiplexNoisy)) / samples;
-frequencySpectrum = normalised_fft(audioMultiplexNoisy);
+AudioMultiplexNoisy_f = normalised_fft(audioMultiplexNoisy);
 
 % Plot the time domain vector
 figure;
@@ -37,7 +38,7 @@ grid on;
 
 % plot in the frequency spectrum
 subplot(2,1,1);
-plot(freq, amp2dB(abs(fftshift(frequencySpectrum))));
+plot(fA, amp2dB(abs(fftshift(AudioMultiplexNoisy_f))));
 title('audioMultiplexNoisy in Frequency domain');
 xlabel('Frequency (Hz)');
 ylabel('Magnitude');
@@ -47,26 +48,13 @@ grid on;
 % There are 5 carrier frequencies in the frequency domain.  The plot above
 % shows the frequency spikes at [8210, 24190, 40210, 56290, 72160]
 
-%% 1.2 Function used to plot all carrier frequency in the fruequency dB spectrum
-function AdB = amp2dB(A)
-
-         AdB = 20*log10(A + eps);
-
-end
-
-function nfft = normalised_fft(signal)
-
-         nfft = fft(signal) / length(signal);
-
-end
-
 %% Section 1.2 with function block
 %Set the cutoff frequency for each carrier frequency
-cutoffFreq1 = 4210;
-cutoffFreq2 = 20190;
-cutoffFreq3 = 36210;
-cutoffFreq4 = 52290;
-cutoffFreq5 = 68160;
+cutoffFreq1 = 4700;
+cutoffFreq2 = 8600;
+cutoffFreq3 = 8600;
+cutoffFreq4 = 6500;
+cutoffFreq5 = 8500;
 
 % Using assignment 1 multiplexed system
 demultiplex = fft(audioMultiplexNoisy) / fs;
@@ -78,30 +66,16 @@ CF3 = 40210; %40210
 CF4 = 56290; %56290
 CF5 = 72160; %72160
 
-% Create a function to modulate all frequencies using cos(2*pi*f*t);
-function [c, demodulatedSignal, audioReceived, ... 
-                audioNormal, audioReceivedFreq] = ... 
-                carrierFreq(freq, timeVector, signal, cutoffFreq, fs)
-
-    c = cos(2*pi*freq*timeVector);
-    demodulatedSignal = signal.* c;
-    audioReceived = lowpass(demodulatedSignal, cutoffFreq, fs);
-    audioReceived = audioReceived - mean(audioReceived);
-    audioNormal = audioReceived/ max(abs(audioReceived));
-    audioReceivedFreq = normalised_fft(audioReceived);
-
-end 
-
 % Output the functions for each carrier frequency
-[C1, demod1, audioreceived1, audioNormal1, audioReceivedFreq1] = ...
+[C1, demod1, audioreceived1, audioReceivedFreq1] = ...
     carrierFreq(CF1, timeVector, audioMultiplexNoisy, cutoffFreq1, fs);
-[C2, demod2, audioreceived2, audioNormal2, audioReceivedFreq2] = ...
+[C2, demod2, audioreceived2, audioReceivedFreq2] = ...
     carrierFreq(CF2, timeVector, audioMultiplexNoisy, cutoffFreq2, fs);
-[C3, demod3, audioreceived3, audioNormal3, audioReceivedFreq3] = ...
+[C3, demod3, audioreceived3, audioReceivedFreq3] = ...
     carrierFreq(CF3, timeVector, audioMultiplexNoisy, cutoffFreq3, fs);
-[C4, demod4, audioreceived4, audioNormal4, audioReceivedFreq4] = ...
+[C4, demod4, audioreceived4, audioReceivedFreq4] = ...
     carrierFreq(CF4, timeVector, audioMultiplexNoisy, cutoffFreq4, fs);
-[C5, demod5, audioreceived5, audioNormal5, audioReceivedFreq5] = ...
+[C5, demod5, audioreceived5, audioReceivedFreq5] = ...
     carrierFreq(CF5, timeVector, audioMultiplexNoisy, cutoffFreq5, fs);
 
 %% 1.2 Plotting 
@@ -109,26 +83,29 @@ end
 plotFreq = {audioReceivedFreq1, audioReceivedFreq2, audioReceivedFreq3, ...
     audioReceivedFreq4, audioReceivedFreq5};
 
-plotTime = {audioreceived1, audioreceived2, audioreceived3, audioreceived4...
-    , audioreceived5};
+plotTime = {audioreceived1, audioreceived2, audioreceived3, ...
+    audioreceived4, audioreceived5};
 
-plot1_2 = cell(1, 5);
+plotCutoff = {cutoffFreq1, cutoffFreq2, cutoffFreq3, cutoffFreq4, ...
+    cutoffFreq5};
+
+plot1_2 = cell(1, 5); % ? is this ever used?
 
 for i = 1:5
 
     figure;
     subplot(2, 1, 1);
-    plot(freq, amp2dB(fftshift(plotFreq{i})));
-    title('Frequency domain');
+    plot(fA, amp2dB(abs(fftshift(plotFreq{i}))));
+    title(['Frequency Domain Plot of Carrier #' num2str(i)]);
     xlabel('Frequency (Hz)');
     ylabel('Magnitude (dB)');
-    xlim([-cutoffFreq1, cutoffFreq1]);
-    ylim([-180 -20])
+    xlim([-2e4, 2e4]);
+    ylim([-110 -20])
     grid on;
 
     subplot(2, 1, 2);
-    plot(timeVector, plotTime{1});
-    title('Time domain');
+    plot(timeVector, plotTime{i});
+    title(['Time Domain Plot of Carrier #' num2str(i)]);
     xlabel('Time (s)');
     ylabel('Amplitude');
     grid on;
@@ -137,42 +114,41 @@ end
 
 %% 1.2 Carrier 1 listen
 % Listen to the sound of 8210 Hz
-sound(audioreceived1, fs);
+%sound(audioreceived1, fs);
 
 %% 1.2 Carrier 2 listen
 % Listen to the sound of 24190 Hz
-sound(audioreceived2, fs);
+%sound(audioreceived2, fs);
 
 %% 1.2 Carrier 3 listen
 % Listen to the sound of 40210 Hz
-sound(audioreceived3, fs);
+%sound(audioreceived3, fs);
 
 %% 1.2 Carrier 4 listen
 % Listen to the sound of 56290 Hz
-sound(audioreceived4, fs);
+%sound(audioreceived4, fs);
 
 %% 1.2 Carrier 5 listen
 % Listen to the sound of 72160 Hz
-sound(audioreceived5, fs);
+%sound(audioreceived5, fs);
 
 %% Section 1.3
 % Create an impulse
 impulseAudio = [fs, zeros(1, samples - 1)];
 
 %Use the channel feature to model the impulse response 
-channelOutput = channel(sid, impulseAudio, fs);
+channelIR_t = channel(sid, impulseAudio, fs);
 
 %Find the frequency response and create the frequency vector 
-channelFreq = normalised_fft(channelOutput);
-channelFrequency = linspace(-fs/2, fs/2, length(channelOutput) + 1);
-channelFrequency(end) = [];
+ChannelIR_f = normalised_fft(channelIR_t);
+
 
 %Plotting both the magnitude spectrum and multiplexed audio on the same
-graph
+% graph
 figure;
 hold on;
-plot(channelFrequency, amp2dB(abs(fftshift(channelFreq))));
-plot(freq, amp2dB(abs(fftshift(frequencySpectrum))), '--');
+plot(fA, amp2dB(abs(fftshift(ChannelIR_f))));
+plot(fA, amp2dB(abs(fftshift(AudioMultiplexNoisy_f))), '--');
 title('Channel Frequency response and audioMultiplexNoisy');
 xlabel('Frequency Hz');
 ylabel('Magnitude');
@@ -184,68 +160,80 @@ hold off;
 %% Section 1.4
 samples =  length(audioMultiplexNoisy);
 
+% This code is unnecessary -- channelFreq is already the same thing.
+
 % Convert the channel impulse from section 1.3 into the frequency domain 
-frequencyRev = fft(channelOutput, samples); %/ fs;
+%frequencyRev = fft(channelOutput, samples); %/ fs;
+
+% This is also unnecessary -- audioMultiplexNoisy has already been
+% transformed into the frequency domain...
 
 % Convert the audio channel into the frequency domain 
-revfft = fft(audioMultiplexNoisy, samples); %/ fs;
+% revfft = fft(audioMultiplexNoisy, samples); %/ fs;
 
 % Reverse channel distortion
-revAudio = revfft ./ frequencyRev;
-revAudioEqualised = ifft(revAudio); %* fs;
+revdistAudio = AudioMultiplexNoisy_f ./ ChannelIR_f;
+audioequalised_t = ifft(revdistAudio) * fs;
 
-% Set the carrier frequency
-CF1 = 8210; 
-CF2 = 24190; 
-CF3 = 40210; 
-CF4 = 56290; 
-CF5 = 72160;
 
-% Set the cutoff frequencies
-cutoffFreq1 = 8000; %4210;
-cutoffFreq2 = 8000; %20190;
-cutoffFreq3 = 8000; %36210;
-cutoffFreq4 = 8000; %52290;
-cutoffFreq5 = 8000; %68160;
 
-% Create a function for reverse distortion
-function [demRevSignal, cleanAudio, CleanAudio]...
-    = reverseDistortion(freq, revAudioEqualised, cutoffFreq, fs, timeVector)
 
-    % Reverse the channel distortion of the mulitplexed signal
-    c = cos(2*pi*freq*timeVector);
-    demRevSignal = revAudioEqualised.* c;
-    cleanAudio = lowpass(demRevSignal, cutoffFreq, fs);
-    cleanAudio = cleanAudio - mean(cleanAudio);
-    CleanAudio = cleanAudio / max(abs(cleanAudio));
+% Demodulate the individual signals into cleanAudio
 
-end 
+[C1, demod1, audioclean1_t, audioclean1_f] = ...
+    carrierFreq(CF1, timeVector, audioequalised_t, cutoffFreq1, fs);
+[C2, demod2, audioclean2_t, audioclean2_f] = ...
+    carrierFreq(CF2, timeVector, audioequalised_t, cutoffFreq2, fs);
+[C3, demod3, audioclean3_t, audioclean3_f] = ...
+    carrierFreq(CF3, timeVector, audioequalised_t, cutoffFreq3, fs);
+[C4, demod4, audioclean4_t, audioclean4_f] = ...
+    carrierFreq(CF4, timeVector, audioequalised_t, cutoffFreq4, fs);
+[C5, demod5, audioclean5_t, audioclean5_f] = ...
+    carrierFreq(CF5, timeVector, audioequalised_t, cutoffFreq5, fs);
 
-[demRevSignal1, cleanAudio1, CleanAudio1]...
-    = reverseDistortion(CF1, revAudioEqualised, cutoffFreq1, fs, timeVector);
-[demRevSignal2, cleanAudio2, CleanAudio2]...
-    = reverseDistortion(CF2, revAudioEqualised, cutoffFreq2, fs, timeVector);
-[demRevSignal3, cleanAudio3, CleanAudio3]...
-    = reverseDistortion(CF3, revAudioEqualised, cutoffFreq3, fs, timeVector); 
-[demRevSignal4, cleanAudio4, CleanAudio4]...
-    = reverseDistortion(CF4, revAudioEqualised, cutoffFreq4, fs, timeVector);
-[demRevSignal5, cleanAudio5, CleanAudio5]...
-    = reverseDistortion(CF5, revAudioEqualised, cutoffFreq5, fs, timeVector);
+
+
+% % Create a function for reverse distortion
+% function [demRevSignal, cleanAudio, CleanAudio]...
+%     = reverseDistortion(freq, revAudioEqualised, cutoffFreq, fs, timeVector)
+% 
+%     % Reverse the channel distortion of the multiplexed signal
+%     c = cos(2*pi*freq*timeVector);
+%     demRevSignal = revAudioEqualised.* c;
+%     cleanAudio = lowpass(demRevSignal, cutoffFreq, fs, 'Steepness', 0.99);
+%     cleanAudio = cleanAudio - mean(cleanAudio);
+%     CleanAudio = cleanAudio / max(abs(cleanAudio));
+% 
+% end 
+
+% [demRevSignal1, cleanAudio1, CleanAudio1]...
+%     = reverseDistortion(CF1, revAudioEqualised, cutoffFreq1, fs, timeVector);
+% [demRevSignal2, cleanAudio2, CleanAudio2]...
+%     = reverseDistortion(CF2, revAudioEqualised, cutoffFreq2, fs, timeVector);
+% [demRevSignal3, cleanAudio3, CleanAudio3]...
+%     = reverseDistortion(CF3, revAudioEqualised, cutoffFreq3, fs, timeVector); 
+% [demRevSignal4, cleanAudio4, CleanAudio4]...
+%     = reverseDistortion(CF4, revAudioEqualised, cutoffFreq4, fs, timeVector);
+% [demRevSignal5, cleanAudio5, CleanAudio5]...
+%     = reverseDistortion(CF5, revAudioEqualised, cutoffFreq5, fs, timeVector);
 
 %% 1.4 Plotting 
 % Make an array of plotting values
-plot1_4 = {CleanAudio1, CleanAudio2, CleanAudio3, ...
-    CleanAudio4, CleanAudio5};
+
+% audioclean_tN1 = normaliseaudio(audioclean1_t);
+
+plot1_4 = {audioclean1_t, audioclean2_t, audioclean3_t, ...
+    audioclean4_t, audioclean5_t};
 
 for i = 1:5
 
     figure;
     subplot(2, 1, 1);
-    plot(freq, amp2dB(fftshift(fft(plot1_4{i}) / samples)));
+    plot(fA, amp2dB(abs(fftshift(fft(plot1_4{i}) / samples))));
     title('Equalised signal in frequency domain');
     xlabel('Frequency (Hz)');
     ylabel('Magnitude (dB)');
-    xlim([-cutoffFreq1, cutoffFreq1]);
+    xlim([-2e4, 2e4]);
     ylim([-180 -20])
     grid on;
 
@@ -259,30 +247,30 @@ for i = 1:5
 end 
 %% Section 1.4 CF1 
 %Listen to audio signal 
-sound(CleanAudio1, fs);
+sound(audioclean1_t, fs);
 
 %% Section 1.4 CF2 
 %Listen to audio signal 
-sound(CleanAudio2, fs);
+sound(audioclean2_t, fs);
 
 %% Section 1.4 CF3 
 %Listen to audio signal 
-sound(CleanAudio3, fs);
+sound(audioclean3_t, fs);
 
 %% Section 1.4 CF4 
 %Listen to audio signal 
-sound(CleanAudio4, fs);
+sound(audioclean4_t, fs);
 
 %% Section 1.4 CF5 
 %Listen to audio signal 
-sound(CleanAudio5, fs);
+sound(audioclean5_t, fs);
 
 %% Section 1.5 - Ringing-Free Frequency Domain Noise Removal
 % Set the cutoff frequency
 cutofffreq = 4000; 
 carrFreqArray = [8210, 24190, 40210, 56290, 72160]; 
 
-impulseAudio = revAudioEqualised(:); 
+impulseAudio = audioequalised_t(:); 
 impulseLength = length(impulseAudio); 
 
 % Create a time vector
@@ -334,9 +322,47 @@ for i = 1:5
     finalTime = ifft(ifftshift(ZeroShift));
 
     % Step 4: Lowpass filter the reconstructed signal to clean up edges
-    cleanAudio{i} = lowpass(finalTime, cutofffreq, fs);
+    %cleanAudio{i} = lowpass(finalTime, cutofffreq, fs);
        
 end
+
+%% Alternate Approach
+
+plot1_5 = {audioclean1_f, audioclean2_f, audioclean3_f, audioclean4_f, ...
+    audioclean5_f};
+
+for i = 1:5
+
+figure()
+subplot(2,1,1)
+plot(fA, abs(fftshift(plot1_5{i})));
+hold on
+subplot(2,1,2)
+plot(fA, amp2dB(abs(fftshift(plot1_5{i}))));
+
+end
+
+% Frequency with which we search above for single-tone components
+initial_f = 2000;
+
+
+fftshifted = abs(fftshift(audioclean1_f));
+delta_f = fs/length(fA);
+DC_OHz = 1920001;
+freqbin(DC_OHz, 2978);
+
+removetones(input, fA, initial_f)
+
+for i = 1:length(fA)
+    if abs(fA(i)) > initial_f
+        if abs(fftshifted(i)) > 0.02
+            removefreq = i; 
+            disp(i)
+        end
+    end
+end    
+
+    
 
 %% Play the desired audio for carrier Freq 1 
 ChooseAudio = cleanAudio{1};
@@ -363,3 +389,68 @@ ChooseAudio = cleanAudio{5};
 FinalAudio = ChooseAudio / max(abs(ChooseAudio));
 sound(FinalAudio, fs);
 
+%% Function definitions
+
+% Converting amplitudes to decibels.
+function AdB = amp2dB(A)
+
+AdB = 20*log10(A + eps);
+
+end
+
+% A function for performing normalized fast fourier transforms.
+function nfft = normalised_fft(signal)
+
+nfft = fft(signal) / length(signal);
+
+end
+ 
+% Function for modulation of carrier frequencies using cos(2*pi*f*t).
+function [c, demodulatedSignal, audioReceived, audioReceivedFreq] = ... 
+    carrierFreq(freq, timeVector, signal, cutoffFreq, fs)
+
+c = cos(2*pi*freq*timeVector);
+demodulatedSignal = signal.* c;
+audioReceived = lowpass(demodulatedSignal, cutoffFreq, fs, 'Steepness',0.99);
+audioReceived = audioReceived - mean(audioReceived);
+audioReceivedFreq = normalised_fft(audioReceived);
+
+end 
+
+% Normalisation
+
+function NormalisedAudio = normaliseaudio(inputsignal)
+
+    NormalisedAudio = inputsignal / max(abs(inputsignal));
+
+end
+
+function frequency_bin = freqbin(dcvalue, frequency)
+
+    frequency_bin = dcvalue + frequency/0.05;
+
+end
+
+% Function for finding single-tone frequencies
+
+function cleaned_signal = removetones(input, fA, initial_f, threshold)
+
+    % input must be shifted for following arithmetic to function correctly
+    fftshifted = abs(fftshift(input));
+
+    % for the length of the supplied frequency vector
+    for i = 1:length(fA)
+        % if the absolute value of the indexed frequency is greater than
+        % the supplied initial frequency 
+        if abs(fA(i)) > initial_f
+            % AND if that indexed value is greater than the threshold 
+            if abs(fftshifted(i)) > threshold
+                removefreq = i;
+                % currently will display the index but I will edit this
+                % to remove it instead
+                disp(i)
+            end
+        end
+    end
+
+end
