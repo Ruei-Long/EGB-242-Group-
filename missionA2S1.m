@@ -11,23 +11,22 @@ load DataA2 audioMultiplexNoisy fs sid;
 % Begin writing your MATLAB solution below this line.R
 load('DataA2.mat')
 
-%% Section 1.1 plot audioMultiplexNoisy in frequency and time domain
+%% Section 1.1 plot audioMultiplexNoisy in time and frequency domain
+
 %Create a time vector
 samples = length(audioMultiplexNoisy);
 T = samples/fs;
-timeVector = linspace(0, T, samples + 1); % trial to see if it helps the time domain plot. 
+timeVector = linspace(0, T, samples + 1);
 timeVector(end) = [];
 
 % Create a frequency vector
-
 fA = linspace(-fs/2, fs/2, samples + 1);
 fA(end) = [];
 
 % Convert to the frequency domain
-%frequencySpectrum = fftshift(fft(audioMultiplexNoisy)) / samples;
 AudioMultiplexNoisy_f = normalised_fft(audioMultiplexNoisy);
 
-% Plot the time domain vector
+% Plotting in time domain
 figure;
 subplot(2,1,2);
 plot(timeVector, audioMultiplexNoisy);
@@ -36,7 +35,7 @@ xlabel('Time(s)');
 ylabel('Amplitude');
 grid on;
 
-% plot in the frequency spectrum
+% Plot in the frequency domain
 subplot(2,1,1);
 plot(fA, amp2dB(abs(fftshift(AudioMultiplexNoisy_f))));
 title('audioMultiplexNoisy in Frequency domain');
@@ -45,19 +44,15 @@ ylabel('Magnitude');
 ylim([-150 0])
 grid on;
 
-% There are 5 carrier frequencies in the frequency domain.  The plot above
-% shows the frequency spikes at [8210, 24190, 40210, 56290, 72160]
 
 %% Section 1.2 with function block
-%Set the cutoff frequency for each carrier frequency
+
+%Set the LPF cutoff frequency for each carrier frequency
 cutoffFreq1 = 4700;
 cutoffFreq2 = 8600;
 cutoffFreq3 = 8600;
 cutoffFreq4 = 6500;
 cutoffFreq5 = 8500;
-
-% Using assignment 1 multiplexed system
-demultiplex = fft(audioMultiplexNoisy) / fs;
 
 % Define carrier frequency
 CF1 = 8210;  %8210      
@@ -66,7 +61,8 @@ CF3 = 40210; %40210
 CF4 = 56290; %56290
 CF5 = 72160; %72160
 
-% Output the functions for each carrier frequency
+% Function calls for each carrier frequency
+
 [C1, demod1, audioreceived1, audioReceivedFreq1] = ...
     carrierFreq(CF1, timeVector, audioMultiplexNoisy, cutoffFreq1, fs);
 [C2, demod2, audioreceived2, audioReceivedFreq2] = ...
@@ -112,26 +108,6 @@ for i = 1:5
 
 end 
 
-%% 1.2 Carrier 1 listen
-% Listen to the sound of 8210 Hz
-sound(audioreceived1, fs);
-
-%% 1.2 Carrier 2 listen
-% Listen to the sound of 24190 Hz
-sound(audioreceived2, fs);
-
-%% 1.2 Carrier 3 listen
-% Listen to the sound of 40210 Hz
-sound(audioreceived3, fs);
-
-%% 1.2 Carrier 4 listen
-% Listen to the sound of 56290 Hz
-sound(audioreceived4, fs);
-
-%% 1.2 Carrier 5 listen
-% Listen to the sound of 72160 Hz
-sound(audioreceived5, fs);
-
 %% Section 1.3
 % Create an impulse
 impulseAudio = [fs, zeros(1, samples - 1)];
@@ -175,9 +151,6 @@ samples =  length(audioMultiplexNoisy);
 revdistAudio = AudioMultiplexNoisy_f ./ ChannelIR_f;
 audioequalised_t = ifft(revdistAudio) * fs;
 
-
-
-
 % Demodulate the individual signals into cleanAudio
 
 [C1, demod1, audioclean1_t, audioclean1_f] = ...
@@ -191,36 +164,8 @@ audioequalised_t = ifft(revdistAudio) * fs;
 [C5, demod5, audioclean5_t, audioclean5_f] = ...
     carrierFreq(CF5, timeVector, audioequalised_t, cutoffFreq5, fs);
 
-
-
-% % Create a function for reverse distortion
-% function [demRevSignal, cleanAudio, CleanAudio]...
-%     = reverseDistortion(freq, revAudioEqualised, cutoffFreq, fs, timeVector)
-% 
-%     % Reverse the channel distortion of the multiplexed signal
-%     c = cos(2*pi*freq*timeVector);
-%     demRevSignal = revAudioEqualised.* c;
-%     cleanAudio = lowpass(demRevSignal, cutoffFreq, fs, 'Steepness', 0.99);
-%     cleanAudio = cleanAudio - mean(cleanAudio);
-%     CleanAudio = cleanAudio / max(abs(cleanAudio));
-% 
-% end 
-
-% [demRevSignal1, cleanAudio1, CleanAudio1]...
-%     = reverseDistortion(CF1, revAudioEqualised, cutoffFreq1, fs, timeVector);
-% [demRevSignal2, cleanAudio2, CleanAudio2]...
-%     = reverseDistortion(CF2, revAudioEqualised, cutoffFreq2, fs, timeVector);
-% [demRevSignal3, cleanAudio3, CleanAudio3]...
-%     = reverseDistortion(CF3, revAudioEqualised, cutoffFreq3, fs, timeVector); 
-% [demRevSignal4, cleanAudio4, CleanAudio4]...
-%     = reverseDistortion(CF4, revAudioEqualised, cutoffFreq4, fs, timeVector);
-% [demRevSignal5, cleanAudio5, CleanAudio5]...
-%     = reverseDistortion(CF5, revAudioEqualised, cutoffFreq5, fs, timeVector);
-
 %% 1.4 Plotting 
 % Make an array of plotting values
-
-% audioclean_tN1 = normaliseaudio(audioclean1_t);
 
 plot1_4 = {audioclean1_t, audioclean2_t, audioclean3_t, ...
     audioclean4_t, audioclean5_t};
@@ -245,88 +190,8 @@ for i = 1:5
     grid on;
 
 end 
-%% Section 1.4 CF1 
-%Listen to audio signal 
-%sound(audioclean1_t, fs);
 
-%% Section 1.4 CF2 
-%Listen to audio signal 
-%sound(audioclean2_t, fs);
-
-%% Section 1.4 CF3 
-%Listen to audio signal 
-%sound(audioclean3_t, fs);
-
-%% Section 1.4 CF4 
-%Listen to audio signal 
-%sound(audioclean4_t, fs);
-
-%% Section 1.4 CF5 
-%Listen to audio signal 
-%sound(audioclean5_t, fs);
-
-%% Section 1.5 
-% Set the cutoff frequency
-cutofffreq = 4000; 
-carrFreqArray = [8210, 24190, 40210, 56290, 72160]; 
-
-impulseAudio = audioequalised_t(:); 
-impulseLength = length(impulseAudio); 
-
-% Create a time vector
-time = linspace(0, T, impulseLength + 1);
-time(end) = [];
-
-% Create a frequency vector
-freqVec = linspace(-fs/2, fs/2, impulseLength + 1);
-freqVec(end) = [];
-freqVec = freqVec';
-
-% Create a for loop to modulate all carrier frequencies
-cleanAudio = cell(1, 5); 
-
-for i = 1:5
-    % Create a vector with the cut off frequency
-    passband = [carrFreqArray(i) - cutofffreq, carrFreqArray(i) + cutofffreq];
-    
-    % Use a bandpass filter to isolate clean audio
-    audioBand = bandpass(impulseAudio, passband, fs);    
-
-    % Modulate the audio to 0Hz with the carrier modulation
-    c = cos(2*pi*carrFreqArray(i)*time);
-    c = c (:);
-    demsignal = audioBand .* c;    
- 
-    % Take the full signal into the frequency domain
-    ZeroShift = fftshift(fft(demsignal)); 
-
-   % From analysing all the plots in section 1.4 it was identified that
-   % all the carrier frequencies had noise from 2200 - 2900 Hz
-    noiseSpike = 2600; 
-    tolerance = 400; 
-
-    % Adjust vector to remove noisy signals
-    noiseSpikes = (abs(freqVec) >= (noiseSpike - tolerance)) & ...
-        (abs(freqVec) <= (noiseSpike + tolerance));  
-    ZeroShift(noiseSpikes) = 0; % Zero out noisy freq
-
-    figure
-    plot(freqVec, amp2dB(abs(ZeroShift)));
-    title('Final Audio in the Frequency Domain');
-    xlabel('Frequency Hz');
-    ylabel('Magnitude dB');
-    grid on;
-    xlim([-cutofffreq, cutofffreq]);
-
-    % Convert Back to the time domain
-    finalTime = ifft(ifftshift(ZeroShift));
-
-    % Step 4: Lowpass filter the reconstructed signal to clean up edges
-    cleanAudio{i} = lowpass(finalTime, cutofffreq, fs);
-       
-end
-
-%% Alternate Approach
+%% Section 1.5
 
 plot1_5 = {audioclean1_f, audioclean2_f, audioclean3_f, audioclean4_f, ...
     audioclean5_f};
@@ -395,25 +260,12 @@ function [c, demodulatedSignal, audioReceived, audioReceivedFreq] = ...
 
 c = cos(2*pi*freq*timeVector);
 demodulatedSignal = signal.* c;
-audioReceived = lowpass(demodulatedSignal, cutoffFreq, fs, 'Steepness',0.99);
+audioReceived = lowpass(demodulatedSignal, cutoffFreq, fs, ...
+    'Steepness',0.99);
 audioReceived = audioReceived - mean(audioReceived);
 audioReceivedFreq = normalised_fft(audioReceived);
 
 end 
-
-% Normalisation
-
-function NormalisedAudio = normaliseaudio(inputsignal)
-
-    NormalisedAudio = inputsignal / max(abs(inputsignal));
-
-end
-
-function frequency_bin = freqbin(dcvalue, frequency)
-
-    frequency_bin = dcvalue + frequency/0.05;
-
-end
 
 % Function for finding single-tone frequencies
 
@@ -439,8 +291,7 @@ function [Cleaned_Signal_f, cleaned_signal_t] = ...
                 % disp(i); % debug display 
                 % (uncomment to see indices and verify correct frequencies)
                 fftshifted(removefreq) = 0;
-                % disp(fftshifted(removefreq)); % also a debug 
-                
+                % disp(fftshifted(removefreq)); % also a debug
             end
         end
     end
