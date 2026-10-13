@@ -10,6 +10,7 @@ clear all; close all;
 % Begin writing your MATLAB solution below this line.
 
 %% Section 2.1 -- Plotting impulse vs step response of DC motor system
+s = tf('s');
 
 % Time vector
 
@@ -31,15 +32,15 @@ figure()
 plot(tv025, OL_stepResponse);
 hold on
 title('Step Input vs Step Response')
-plot(tv025, heaviside(tv025));
-legend('Step Input', 'Step Response')
+plot(tv025, heaviside(tv025), 'LineWidth', 2);
+legend('Step Response', 'Step Input')
 xlabel('Time (s)')
-ylabel('\psi (t)')
+ylabel('\psi (t) (rad)')
+ylim([0, 20])
 hold off
 
 %% Section 2.3 
 
-s = tf('s');
 num = 1;
 den = [1, 0.5, 1];
 H = tf(num, den);
@@ -49,6 +50,17 @@ CL_stepResponse = lsim(H, inputStep, tv025);
 
 figure()
 plot(tv025, CL_stepResponse);
+
+
+%% Verifying Hand-working in MATLAB
+
+num_v = 1;
+den_v = [1, 0.5, 0];
+OL_stepResponse_tf = tf(num_v, den_v);
+
+OL_stepResponse_v = lsim(OL_stepResponse_tf, inputStep, tv025);
+figure()
+plot(tv025, OL_stepResponse_v);
 
 %% Section 2.4 - Peak (Tp), Settling (Ts) time, percent overshoot (pcOS)
 
@@ -150,8 +162,8 @@ disp(counter_descale)
 
 Kfwd_const = 1*((0.5^2)/4 + pi^2/(14^2));
 
-ltiview(cameraTF);
-stepinfo(cameraTF)
+ltiview(testTF);
+stepinfo(testTF)
 
 %%
 Kfb_scalar = 2*pi;
