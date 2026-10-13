@@ -114,23 +114,23 @@ end
 
 %% 1.2 Carrier 1 listen
 % Listen to the sound of 8210 Hz
-%sound(audioreceived1, fs);
+sound(audioreceived1, fs);
 
 %% 1.2 Carrier 2 listen
 % Listen to the sound of 24190 Hz
-%sound(audioreceived2, fs);
+sound(audioreceived2, fs);
 
 %% 1.2 Carrier 3 listen
 % Listen to the sound of 40210 Hz
-%sound(audioreceived3, fs);
+sound(audioreceived3, fs);
 
 %% 1.2 Carrier 4 listen
 % Listen to the sound of 56290 Hz
-%sound(audioreceived4, fs);
+sound(audioreceived4, fs);
 
 %% 1.2 Carrier 5 listen
 % Listen to the sound of 72160 Hz
-%sound(audioreceived5, fs);
+sound(audioreceived5, fs);
 
 %% Section 1.3
 % Create an impulse
@@ -265,7 +265,7 @@ sound(audioclean4_t, fs);
 %Listen to audio signal 
 sound(audioclean5_t, fs);
 
-%% Section 1.5 - Ringing-Free Frequency Domain Noise Removal
+%% Section 1.5 
 % Set the cutoff frequency
 cutofffreq = 4000; 
 carrFreqArray = [8210, 24190, 40210, 56290, 72160]; 
@@ -322,7 +322,7 @@ for i = 1:5
     finalTime = ifft(ifftshift(ZeroShift));
 
     % Step 4: Lowpass filter the reconstructed signal to clean up edges
-    %cleanAudio{i} = lowpass(finalTime, cutofffreq, fs);
+    cleanAudio{i} = lowpass(finalTime, cutofffreq, fs);
        
 end
 
