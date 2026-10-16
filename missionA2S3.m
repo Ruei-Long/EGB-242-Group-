@@ -16,10 +16,11 @@ imwrite(image_in_2D1, 'image_in_2D1.png');
 % this function use for make each image
 function image = received_site_image(imagesReceived, image_in_1D_num)
     % pixel is top-to-bottom first, then left-to-right
-    tall = 480;
-    wide = 640;
+    tall = 480; %pixel
+    wide = 640; %pixel
     image_in_1D = imagesReceived(image_in_1D_num,:);
-    image = reshape(image_in_1D, tall, wide);
+    % convert the pixel stream to an image matrix
+    image = reshape(image_in_1D, tall, wide); 
     figure;
     imshow(image);
 end
@@ -52,11 +53,15 @@ function f = Visualise_signal_freq(imagesReceived, image_in_1D_num)
     f = (-N/2 : N/2 - 1) * (samples_frequency / N); %Hz
     X = fft(im1D);
     figure;
-    plot(f, abs(fftshift(X))/N);
+    plot(f, amp2dB(abs(fftshift(X))/N));
     xlabel("Frequency (Hz)");
-    ylabel("Magnitude");
-    title("Recived Signal in Frequency Domain");
+    ylabel("Magnitude（dB)");
+    title("Received Signal in Frequency Domain");
     grid on;
+end
+
+function AdB = amp2dB(A)
+    AdB = 20*log10(A + eps);
 end
 
 %% Section 3.3 - filter justification
@@ -66,6 +71,15 @@ end
 [H_act1, Act1_2D_output] = Active_filter1(imagesReceived, 1);
 [H_act2, Act2_2D_output] = Active_filter2(imagesReceived, 1); 
 ltiview(H_pass1, H_pass2, H_act1, H_act2);
+
+function [R1, R2, C1, C2, R, C] = filter_value()
+    R1 = 1200;
+    R2 = 1000;
+    C1 = 10e-6;
+    C2 = 4.7e-6;
+    R = 820;
+    C = 1e-6;
+end
 
 function im2D_output = Clean_image_output(imagesReceived, im1D_num, H)
     samples_frequency = 1000;
@@ -79,10 +93,7 @@ end
 function [H, im2D_output] = Passive_filter1(imagesReceived, im1D_num) 
     % filter value
     s = tf('s');
-    R1 = 1200;
-    R2 = 1000;
-    C1 = 10e-6;
-    C2 = 4.7e-6;
+    [R1, R2, C1, C2] = filter_value();
     %num = sR1C1
     %den = s^2(R1R2C1C2)+s(R1C1+R2C2)+1
     num = R1*C1*s;
@@ -95,10 +106,7 @@ end
 function [H,im2D_output] = Passive_filter2(imagesReceived, im1D_num) 
     % filter value
     s = tf('s');
-    R1 = 1200;
-    R2 = 1000;
-    C1 = 10e-6;
-    C2 = 4.7e-6;
+    [R1, R2, C1, C2] = filter_value();
     %num = 1
     %den = s^2(R1R2C1C2)+s(R1C1+R1C2+R2C2)+1
     num = 1;
@@ -111,8 +119,7 @@ end
 function [H,im2D_output] = Active_filter1(imagesReceived, im1D_num)
     % filter value
     s = tf('s');
-    R = 820;
-    C = 1e-6;
+    [~,~,~,~,R,C] = filter_value();
     %num = 1/(RC)^2
     %den = s^2+2*s/RC+1/(RC)^2
     num = 1/(R*C)^2;
@@ -125,8 +132,7 @@ end
 function [H,im2D_output] = Active_filter2(imagesReceived, im1D_num) 
     % filter value
     s = tf('s');
-    R = 820;
-    C = 1e-6;
+    [~,~,~,~,R,C] = filter_value();
     %num = s^2
     %den = s^2+2*s/RC+1/(RC)^2
     num = s^2;
@@ -167,7 +173,7 @@ function f = Visualise_signal_clean_freq(clean_image)
     f = (-N/2 : N/2 - 1) * (samples_frequency / N); %Hz
     X = fft(clean_image);
     figure;
-    plot(f, abs(fftshift(X))/N);
+    plot(f, amp2dB(abs(fftshift(X))/N));
     xlabel("Frequency (Hz)");
     ylabel("Magnitude");
     title("Recived Signal in Frequency Domain");
