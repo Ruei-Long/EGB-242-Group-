@@ -213,3 +213,71 @@ function [H,im2D_output] = Active_filter2(im1D)
     % Simulate the filter response to obtain the cleaned output signal
     im2D_output = Clean_image_output(im1D, H);
 end
+
+%% Section 3.4 display clean image - time & frequency domain
+[~, clean_image1] = Active_filter1(imagesReceived,1);
+clean_image_1 = reshape(clean_image1, 480, 640);
+figure;
+imshow(clean_image_1);
+imwrite(clean_image_1, 'clean_image_1.png');
+
+clean_time_domain_1 = Visualise_signal_clean_time(clean_image1);
+saveas(gcf, 'clean_time_domain.png');
+clean_freq_domain_1 = Visualise_signal_clean_freq(clean_image1);
+saveas(gcf, 'clean_freq_domain.png');
+
+% after filter time domain plot
+function t = Visualise_signal_clean_time(clean_image)
+    N = length(clean_image);  % length of image
+    samples_frequency = 1000; % pixel/sec
+    t = linspace(0, (N-1)/samples_frequency, N);
+    figure;
+    plot(t, clean_image);
+    xlabel("Time (s)");
+    ylabel("Amplitude");
+    title("Received Signal in Time Domain");
+    grid on;
+end
+
+% frequency domain
+function f = Visualise_signal_clean_freq(clean_image)
+    N = length(clean_image);  %length of image
+    samples_frequency = 1000; %pixel/sec
+    f = (-N/2 : N/2 - 1) * (samples_frequency / N); %Hz
+    X = fft(clean_image);
+    figure;
+    plot(f, amp2dB(abs(fftshift(X))/N));
+    xlabel("Frequency (Hz)");
+    ylabel("Magnitude");
+    title("Received Signal in Frequency Domain");
+    grid on;
+end
+
+%% Section 3.5 - filtering each image
+image_in_2D2 = received_site_image(imagesReceived, 2);
+imwrite(image_in_2D2, 'image_in_2D2.png');
+image_in_2D3 = received_site_image(imagesReceived, 3);
+imwrite(image_in_2D3, 'image_in_2D3.png');
+image_in_2D4 = received_site_image(imagesReceived, 4);
+imwrite(image_in_2D4, 'image_in_2D4.png');
+
+% image 2
+[~, clean_image2] = Active_filter1(imagesReceived,2);
+clean_image_2 = reshape(clean_image2, 480, 640);
+figure;
+imshow(clean_image_2);
+saveas(gcf, 'clean_image2.png');
+% image 3
+[~, clean_image3] = Active_filter1(imagesReceived,3);
+clean_image_3 = reshape(clean_image3, 480, 640);
+figure;
+imshow(clean_image_3);
+saveas(gcf, 'clean_image3.png');
+% image 4
+[~, clean_image4] = Active_filter1(imagesReceived,4);
+clean_image_4 = reshape(clean_image4, 480, 640);
+figure;
+imshow(clean_image_4);
+saveas(gcf, 'clean_image4.png');
+
+%% Function Definitions
