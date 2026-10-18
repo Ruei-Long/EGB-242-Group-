@@ -167,6 +167,9 @@ end
 Kfwd_Tp14 = counter_descale;
 disp(Kfwd_Tp14)
 
+ltiview(testTF);
+stepinfo(testTF);
+
 % Setting Kfb to 1, we find the value to achieve ~14s Tp is approx 0.1128
 % This gain product may now be used to find the value of Kfwd for our 
 % intended final value.
@@ -178,13 +181,13 @@ disp(Kfwd_Tp14)
 % Therefore (given this is an underdamped case and the math is valid),
 % we elect to use the calculated value, rather than the numerical above.
 
+
+
+
+
+%% Setting Specified Gain Factor and transfer function
+
 gain_factor = (0.5^2)/4 + pi^2/(14^2);
-
-ltiview(testTF);
-stepinfo(testTF)
-
-%%
-
 Kfb_scalar = 2*pi;
 
 cameraTF = tfeval(gain_factor*Kfb_scalar, 1/Kfb_scalar, tv025, inputStep);
@@ -199,7 +202,13 @@ endVoltage   = 7/12;
 
 [startIm, finalIm] = cameraPan(startVoltage, endVoltage, cameraTF);
 
+%% Showing the first image
 
+imshow(startIm);
+
+%% Showing the final image
+
+imshow(finalIm);
 %% Function Definitions
 
 % This function helps to evaluate the adjustable gains of the transfer

@@ -162,7 +162,7 @@ function t = Visualise_signal_clean_time(clean_image)
     plot(t, clean_image);
     xlabel("Time (s)");
     ylabel("Amplitude");
-    title("Recived Signal in Time Domain");
+    title("Received Signal in Time Domain");
     grid on;
 end
 
@@ -176,7 +176,7 @@ function f = Visualise_signal_clean_freq(clean_image)
     plot(f, amp2dB(abs(fftshift(X))/N));
     xlabel("Frequency (Hz)");
     ylabel("Magnitude");
-    title("Recived Signal in Frequency Domain");
+    title("Received Signal in Frequency Domain");
     grid on;
 end
 
@@ -206,4 +206,6 @@ clean_image_4 = reshape(clean_image4, 480, 640);
 figure;
 imshow(clean_image_4);
 saveas(gcf, 'clean_image4.png');
+
+%% Function Definitions 
 
