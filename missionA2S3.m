@@ -28,7 +28,7 @@ saveas(gcf, 'derty_freq_domain.png');
 ltiview(H_pass1, H_pass2, H_act1, H_act2);
 
 %% Section 3.4 display clean image - time & frequency domain
-[~, clean_image1] = Active_filter2(image_in_1D1);
+[~, clean_image1] = Active_filter1(image_in_1D1);
 clean_image_1 = reshape(clean_image1, 480, 640);
 figure;
 imshow(clean_image_1);
