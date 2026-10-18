@@ -31,11 +31,10 @@ figure()
 plot(tv025, OL_stepResponse);
 hold on
 title('Step Input vs Step Response')
-plot(tv025, heaviside(tv025), 'LineWidth', 2);
-legend('Step Response', 'Step Input')
+plot(tv025, heaviside(tv025));
+legend('Step Input', 'Step Response')
 xlabel('Time (s)')
-ylabel('\psi (t) (rad)')
-ylim([0, 20])
+ylabel('\psi (t)')
 hold off
 
 % ltiview 
@@ -74,17 +73,6 @@ hold off
 % LTIview for pole-zero plot
 
 ltiview(H, OL_stepResponse_LTI)
-
-
-%% Verifying Hand-working in MATLAB
-
-num_v = 1;
-den_v = [1, 0.5, 0];
-OL_stepResponse_tf = tf(num_v, den_v);
-
-OL_stepResponse_v = lsim(OL_stepResponse_tf, inputStep, tv025);
-figure()
-plot(tv025, OL_stepResponse_v);
 
 %% Section 2.4 - Peak (Tp), Settling (Ts) time, percent overshoot (pcOS)
 
@@ -182,6 +170,9 @@ stepinfo(testTF);
 % we elect to use the calculated value, rather than the numerical above.
 
 
+
+ltiview(cameraTF);
+stepinfo(cameraTF)
 
 
 

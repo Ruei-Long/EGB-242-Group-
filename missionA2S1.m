@@ -55,11 +55,11 @@ cutoffFreq4 = 6500;
 cutoffFreq5 = 8500;
 
 % Define carrier frequency
-CF1 = 8210;  %8210      
-CF2 = 24190; %24190
-CF3 = 40210; %40210
-CF4 = 56290; %56290
-CF5 = 72160; %72160
+CF1 = 8210;       
+CF2 = 24190; 
+CF3 = 40210; 
+CF4 = 56290; 
+CF5 = 72160; 
 
 % Function calls for each carrier frequency
 
@@ -85,26 +85,35 @@ plotTime = {audioreceived1, audioreceived2, audioreceived3, ...
 plotCutoff = {cutoffFreq1, cutoffFreq2, cutoffFreq3, cutoffFreq4, ...
     cutoffFreq5};
 
-plot1_2 = cell(1, 5); % ? is this ever used?
+% Plot all of the frequency domain plot in the 1 figure
+figure();
 
 for i = 1:5
 
-    figure;
-    subplot(2, 1, 1);
+    subplot(5, 1, i);
     plot(fA, amp2dB(abs(fftshift(plotFreq{i}))));
     title(['Frequency Domain Plot of Carrier #' num2str(i)]);
     xlabel('Frequency (Hz)');
     ylabel('Magnitude (dB)');
     xlim([-2e4, 2e4]);
-    ylim([-110 -20])
+    ylim([-140 -20])
     grid on;
+    sgtitle('Modulation plot for frequency domain #1-5');
 
-    subplot(2, 1, 2);
+end 
+
+% Plot all of the time domain plot on the 1 figure
+figure();
+
+for i = 1:5
+
+    subplot(5, 1, i);
     plot(timeVector, plotTime{i});
     title(['Time Domain Plot of Carrier #' num2str(i)]);
     xlabel('Time (s)');
     ylabel('Amplitude');
     grid on;
+    sgtitle('Modulation plot for time domain #1-5');
 
 end 
 
@@ -118,7 +127,6 @@ channelIR_t = channel(sid, impulseAudio, fs);
 %Find the frequency response and create the frequency vector 
 ChannelIR_f = normalised_fft(channelIR_t);
 
-
 %Plotting both the magnitude spectrum and multiplexed audio on the same
 % graph
 figure;
@@ -129,23 +137,11 @@ title('Channel Frequency response and audioMultiplexNoisy');
 xlabel('Frequency Hz');
 ylabel('Magnitude');
 legend('Channel frequency response', 'Audio multiplex spectrum');
-%ylim([0, 0.2]);
-%xlim([0, 0.05]);
 grid on;
 hold off;
 %% Section 1.4
+% Set the length of audioMultiplexNoisy
 samples =  length(audioMultiplexNoisy);
-
-% This code is unnecessary -- channelFreq is already the same thing.
-
-% Convert the channel impulse from section 1.3 into the frequency domain 
-%frequencyRev = fft(channelOutput, samples); %/ fs;
-
-% This is also unnecessary -- audioMultiplexNoisy has already been
-% transformed into the frequency domain...
-
-% Convert the audio channel into the frequency domain 
-% revfft = fft(audioMultiplexNoisy, samples); %/ fs;
 
 % Reverse channel distortion
 revdistAudio = AudioMultiplexNoisy_f ./ ChannelIR_f;
@@ -166,46 +162,46 @@ audioequalised_t = ifft(revdistAudio) * fs;
 
 %% 1.4 Plotting 
 % Make an array of plotting values
-
-plot1_4 = {audioclean1_t, audioclean2_t, audioclean3_t, ...
+revEqualiseplot = {audioclean1_t, audioclean2_t, audioclean3_t, ...
     audioclean4_t, audioclean5_t};
+
+% Plot each of the frequency domain on the one plot with a for loop 
+figure();
 
 for i = 1:5
 
-    figure;
-    subplot(2, 1, 1);
-    plot(fA, amp2dB(abs(fftshift(fft(plot1_4{i}) / samples))));
-    title('Equalised signal in frequency domain');
+    %figure;
+    subplot(5, 1, i);  
+    plot(fA, amp2dB(abs(fftshift(fft(revEqualiseplot{i}) / samples))));
+    title(['Equalised signal in the frequency domain #' num2str(i)]);
     xlabel('Frequency (Hz)');
     ylabel('Magnitude (dB)');
-    xlim([-2e4, 2e4]);
-    ylim([-180 -20])
+    xlim([-15000, 15000]);
+    ylim([-200, 0]);
     grid on;
-
-    subplot(2, 1, 2);
-    plot(timeVector, plot1_4{i});
-    title('Equalised signal in time domain');
-    xlabel('Time (s)');
-    ylabel('Amplitude');
-    grid on;
+    sgtitle('Reverse equalised plot frequency domain #1-5');
 
 end 
 
-%% Section 1.5
-
-plot1_5 = {audioclean1_f, audioclean2_f, audioclean3_f, audioclean4_f, ...
-    audioclean5_f};
-
+% Plot each of the time domain plots on in the one for loop
+figure();
 for i = 1:5
 
-figure()
-subplot(2,1,1)
-plot(fA, abs(fftshift(plot1_5{i})));
-hold on
-subplot(2,1,2)
-plot(fA, amp2dB(abs(fftshift(plot1_5{i}))));
+    subplot(5, 1, i);  
+    plot(timeVector, revEqualiseplot{i});
+    title(['Equalised signal in the time domain #' num2str(i)]);
+    xlabel('Time (s)');
+    ylabel('Amplitude');
+    grid on;
+    sgtitle('Reverse equalised plot time domain #1-5');
 
-end
+end 
+
+
+%% Section 1.5
+
+plotSingleTone = {audioclean1_f, audioclean2_f, audioclean3_f, audioclean4_f, ...
+    audioclean5_f};
 
 % Frequency with which we search above for single-tone components
 initial_f = 2000;
@@ -221,20 +217,22 @@ initial_f = 2000;
 [cleaned_signal_t5, Cleaned_Signal_f5] = ...
     removetones(audioclean5_f, fA, initial_f, cutoffFreq5, fs);
 
-plot1_5 = {cleaned_signal_t1, cleaned_signal_t2, cleaned_signal_t3, ...
+plotSingleTone = {cleaned_signal_t1, cleaned_signal_t2, cleaned_signal_t3, ...
     cleaned_signal_t4, cleaned_signal_t5};
-
 plot1_6 = {Cleaned_Signal_f1, Cleaned_Signal_f2, Cleaned_Signal_f3, ...
     Cleaned_Signal_f4, Cleaned_Signal_f5};
 
+% Plot all clean frequency domain plots on the same figure 
+figure()
 for i = 1:5
 
-    figure()
-    subplot(2,1,1)
-    plot(fA, amp2dB(abs(fftshift(plot1_5{i}))));
-    hold on
-    subplot(2,1,2)
-    plot(timeVector, plot1_6{i});
+    subplot(5,1,i)
+    plot(fA, amp2dB(abs(fftshift(plotSingleTone{i}))));
+    title(['Final clean audio signal #' num2str(i)]);
+    xlabel('Frequency (Hz)');
+    ylabel('Magnitude (dB)');
+    grid on;  
+    sgtitle('Single tone plot for frequency domain #1-5');
 
 end
 
